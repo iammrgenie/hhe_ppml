@@ -10,7 +10,7 @@ link_directories(/usr/local/lib)
 add_executable(hhe-server hhe-server.cpp)
 add_executable(hhe-client hhe-client.cpp)
 
-#target_link_libraries(hhe-client SEAL::seal)
-target_link_libraries(hhe-client SEAL::seal_shared) # for Mac
-#target_link_libraries(hhe-server SEAL::seal)
-target_link_libraries(hhe-server SEAL::seal_shared) # for Mac
+target_link_libraries(hhe-client SEAL::seal)
+#target_link_libraries(hhe-client SEAL::seal_shared) # for Mac
+target_link_libraries(hhe-server SEAL::seal)
+#target_link_libraries(hhe-server SEAL::seal_shared) # for Mac

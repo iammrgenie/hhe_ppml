@@ -50,9 +50,18 @@ int main (int argc, const char * argv[]){
 	} 
 
     cout << "[Client] Connected to Server\n";
-    send(clientSocket, "Testing out the Socket ", 40, 0);
 
-    recv(clientSocket, TestRecv, 82, 0);
+    cout << "[Client] Receiving Encryption Parameters\n";
+
+    recv(clientSocket, TestRecv, 20, 0);
+
+    for (int i = 0; i < 20; i ++) {
+        cout << TestRecv[i];
+    }
+
+    cout << endl;
+
+    /*
     string outTest = convertChar2String(TestRecv);
     data_stream << outTest;
 
@@ -61,6 +70,7 @@ int main (int argc, const char * argv[]){
     SEALContext context(parms);
 
     print_parameters(context);
+    */
 
     close(clientSocket);
     return 0;

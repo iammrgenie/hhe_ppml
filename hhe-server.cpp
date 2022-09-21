@@ -96,17 +96,8 @@ int main (int argc, const char * argv[]){
         }
 
         //Receive or Send data 
-        sizeBytesReceived = recv(socketClient, buff, 4096, 0);
-        if (sizeBytesReceived == -1) {
-            std::cerr << "Error receiving message. Abort!!!";
-            break;
-        } else if (sizeBytesReceived == 0) {
-            std::cout << "Client Disconnected " << std::endl;
-            break;
-        }
-
-        //Send Data back to Client
-        send(socketClient, TestSend, size + 1, 0);
+        cout << "[Server] Sending Encryption Parameters\n";
+        send(socketClient, "Test Receive", 20, 0);
 
         close(socketClient);
     }
