@@ -1,1 +1,0 @@
-/bin/c++ "CMakeFiles/hhe-client.dir/hhe-client.cpp.o" -o hhe-client   -L/usr/local/lib  -Wl,-rpath,/usr/local/lib /usr/local/lib/libseal-4.0.a -pthread 
