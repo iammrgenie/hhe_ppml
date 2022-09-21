@@ -55,7 +55,7 @@ int main (int argc, const char * argv[]){
 
     recv(clientSocket, TestRecv, 20, 0);
 
-    for (int i = 0; i < 20; i ++) {
+    for (int i = 0; i < 82; i ++) {
         cout << TestRecv[i];
     }
 
@@ -71,7 +71,7 @@ int main (int argc, const char * argv[]){
 
     print_parameters(context);
     */
-
+   
     close(clientSocket);
     return 0;
 

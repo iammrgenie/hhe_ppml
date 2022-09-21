@@ -21,6 +21,12 @@ stringstream parms_stream;
 stringstream data_stream;
 stringstream sk_stream;
 
+string convertChar2String(char* in) {
+    string out(in);
+    return out;
+}
+
+
 int main (int argc, const char * argv[]){
 
     //SEAL Parameters
@@ -37,10 +43,18 @@ int main (int argc, const char * argv[]){
 
     string test = parms_stream.str();
 
+    cout << "Serialized string = " << test << endl;
+
     cout << "EncryptionParameters: wrote " << size << " bytes" << endl;
 
     char TestSend[size+1];
     strcpy(TestSend, test.c_str());
+
+    for (int i = 0; i < size; i++) {
+        cout << TestSend[i];
+    }
+
+    cout << "\n";
     
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
@@ -97,7 +111,21 @@ int main (int argc, const char * argv[]){
 
         //Receive or Send data 
         cout << "[Server] Sending Encryption Parameters\n";
-        send(socketClient, "Test Receive", 20, 0);
+        send(socketClient, TestSend, size+1, 0);
+
+        // Test conversion and deserialization
+        string outTest = convertChar2String(TestSend);
+        cout << "Output String " << outTest;
+
+        /*
+        sk_stream << outTest;
+
+        EncryptionParameters parms2;
+        parms2.load(sk_stream);
+        SEALContext context2(parms2);
+
+        print_parameters(context2);
+        */
 
         close(socketClient);
     }
