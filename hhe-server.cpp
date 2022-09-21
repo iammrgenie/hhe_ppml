@@ -15,11 +15,10 @@
 
 int main (int argc, const char * argv[]){
     
-    struct sockaddr_in saddr = {
-        .sin_family = AF_INET,
-        .sin_addr.s_addr = INADDR_ANY,
-        .sin_port = htons(PORT)
-    };
+    struct sockaddr_in saddr;
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = INADDR_ANY;
+    saddr.sin_port = htons(PORT);
 
     //Client variables
     struct sockaddr_in caddr;
@@ -51,7 +50,6 @@ int main (int argc, const char * argv[]){
 
     //loop while waiting for connection
     while (true) {
-        std::cout << "1" << std::endl;
         //Accept connections from Clients
         socketClient = accept(socketServer, (struct sockaddr *)&caddr, (socklen_t *)&caddrSize);
         std::cout << "[Server] Client connected successfully " << std::endl;

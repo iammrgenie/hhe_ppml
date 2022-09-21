@@ -1,0 +1,1 @@
+/bin/c++ "CMakeFiles/hhe-server.dir/hhe-server.cpp.o" -o hhe-server   -L/usr/local/lib 
