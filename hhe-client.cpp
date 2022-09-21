@@ -8,14 +8,28 @@
 #include <iostream>
 #include <sstream>
 
+#include <seal/seal.h>
+#include "sealhelper.h"
+
 using namespace std;
+using namespace seal;
+
+stringstream parms_stream;
+stringstream data_stream;
+stringstream sk_stream;
+
+string convertChar2String(char* in) {
+    string out(in);
+    return out;
+}
 
 int main (int argc, const char * argv[]){
     
     int clientSocket, new_connection;
 	struct sockaddr_in server;
 
-    char client_message[4096], server_reply[4096];
+    //char client_message[4096], server_reply[4096];
+    char TestRecv[82];
 
     //create socket
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,6 +51,16 @@ int main (int argc, const char * argv[]){
 
     cout << "[Client] Connected to Server\n";
     send(clientSocket, "Testing out the Socket ", 40, 0);
+
+    recv(clientSocket, TestRecv, 82, 0);
+    string outTest = convertChar2String(TestRecv);
+    data_stream << outTest;
+
+    EncryptionParameters parms;
+    parms.load(data_stream);
+    SEALContext context(parms);
+
+    print_parameters(context);
 
     close(clientSocket);
     return 0;

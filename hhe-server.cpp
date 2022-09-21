@@ -9,11 +9,38 @@
 #include <iostream>
 #include <sstream>
 
-//using namespace std;
+#include <seal/seal.h>
+#include "sealhelper.h"
+
+using namespace std;
+using namespace seal;
 
 #define PORT 5000
 
+stringstream parms_stream;
+stringstream data_stream;
+stringstream sk_stream;
+
 int main (int argc, const char * argv[]){
+
+    //SEAL Parameters
+    EncryptionParameters parms(scheme_type::ckks);
+    size_t poly_modulus_degree = 8192;
+    parms.set_poly_modulus_degree(poly_modulus_degree);
+    parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, {50, 30, 50}));
+
+    SEALContext context(parms);
+    print_parameters(context);
+    cout << "\n";
+
+    auto size = parms.save(parms_stream);
+
+    string test = parms_stream.str();
+
+    cout << "EncryptionParameters: wrote " << size << " bytes" << endl;
+
+    char TestSend[size+1];
+    strcpy(TestSend, test.c_str());
     
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
@@ -46,6 +73,7 @@ int main (int argc, const char * argv[]){
     std::cout << "[Server] listening on port " << ss.str() << std::endl;
 
     char buff[4096];
+
     int sizeBytesReceived;
 
     //loop while waiting for connection
@@ -78,9 +106,7 @@ int main (int argc, const char * argv[]){
         }
 
         //Send Data back to Client
-        send(socketClient, buff, sizeBytesReceived + 1, 0);
-
-        std::cout << std::string(buff, 0, sizeBytesReceived) << std::endl;
+        send(socketClient, TestSend, size + 1, 0);
 
         close(socketClient);
     }
