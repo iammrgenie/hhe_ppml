@@ -35,6 +35,7 @@ int main (int argc, const char * argv[]){
         return -1;
 	} 
 
+    cout << "[Client] Connected to Server\n";
     send(clientSocket, "Testing out the Socket ", 40, 0);
 
     close(clientSocket);
