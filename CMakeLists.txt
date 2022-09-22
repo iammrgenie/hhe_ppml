@@ -58,4 +58,4 @@ target_sources(hhe-test
 #target_link_libraries(hhe-client SEAL::seal_shared) # for Mac
 #target_link_libraries(hhe-server SEAL::seal)
 #target_link_libraries(hhe-server SEAL::seal_shared) # for Mac
-target_link_libraries(hhe-test SEAL::seal_shared keccak aes)
+target_link_libraries(hhe-test SEAL::seal keccak aes)
