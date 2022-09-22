@@ -1,2 +1,0 @@
-/bin/ar qc libaes.a CMakeFiles/aes.dir/aes.cpp.o CMakeFiles/aes.dir/block.cpp.o
-/bin/ranlib libaes.a
