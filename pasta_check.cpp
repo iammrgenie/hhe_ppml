@@ -23,7 +23,8 @@ struct Experim {
 };
 
 int main() {
-    Experim Test[5];
+    int cnt = 5;
+    Experim Test[cnt];
     //Random Symmetric Key
 	vector<uint64_t> in_key = {0x07a30, 0x0cfe2, 0x03bbb, 0x06ab7, 0x0de0b, 0x0c36c, 0x01c39, 0x019e0,
                                     0x0e09c, 0x04441, 0x0c560, 0x00fd4, 0x0c611, 0x0a3fd, 0x0d408, 0x01b17,
@@ -122,7 +123,6 @@ int main() {
 
     //HE Evaluation with Evaluation Key
     cout << "Evaluating using Square operation .... \n" << flush;
-    eval1 = chrono::high_resolution_clock::now();
     for (int i = 0; i < cnt; i++){
       M1.square(Test[i].c_2, Test[i].c_1);
       cout << "Squaring Complete \n";
