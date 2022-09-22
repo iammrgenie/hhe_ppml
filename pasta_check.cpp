@@ -14,7 +14,7 @@ static const bool USE_BATCH = true;
 using namespace std;
 using namespace seal;
 
-struct Experim {
+struct UserData {
     vector<uint64_t> x_i;
     vector<uint64_t> c_i;
     vector<seal::Ciphertext> c_1;
@@ -24,7 +24,7 @@ struct Experim {
 
 int main() {
     //int cnt = 2;
-    Experim Test;
+    UserData Test;
     
     //Random Symmetric Key
     vector<uint64_t> in_key = {0x07a30, 0x0cfe2, 0x03bbb, 0x06ab7, 0x0de0b, 0x0c36c, 0x01c39, 0x019e0,
