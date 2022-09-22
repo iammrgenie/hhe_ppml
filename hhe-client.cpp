@@ -53,21 +53,19 @@ int main (int argc, const char * argv[]){
 
     cout << "[Client] Receiving Encryption Parameters\n";
     string s;
-    while ((int n = recv(clientSocket, TestRecv, sizeof(TestRecv), 0)) > 0 )
+    int n;
+    while ((n = recv(clientSocket, TestRecv, sizeof(TestRecv), 0)) > 0 )
         s.append(TestRecv, TestRecv + n);
 
     cout << s << endl;
 
-    /*
-    string outTest = convertChar2String(TestRecv);
-    data_stream << outTest;
+    data_stream << s;
 
     EncryptionParameters parms;
     parms.load(data_stream);
     SEALContext context(parms);
 
     print_parameters(context);
-    */
    
     close(clientSocket);
     return 0;
