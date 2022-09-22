@@ -52,14 +52,11 @@ int main (int argc, const char * argv[]){
     cout << "[Client] Connected to Server\n";
 
     cout << "[Client] Receiving Encryption Parameters\n";
+    string s;
+    while ((int n = recv(clientSocket, TestRecv, sizeof(TestRecv), 0)) > 0 )
+        s.append(TestRecv, TestRecv + n);
 
-    recv(clientSocket, TestRecv, 20, 0);
-
-    for (int i = 0; i < 82; i ++) {
-        cout << TestRecv[i];
-    }
-
-    cout << endl;
+    cout << s << endl;
 
     /*
     string outTest = convertChar2String(TestRecv);

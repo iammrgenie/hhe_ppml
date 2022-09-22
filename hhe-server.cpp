@@ -42,26 +42,19 @@ int main (int argc, const char * argv[]){
     auto size = parms.save(parms_stream);
 
     string test = parms_stream.str();
-
-    cout << "Serialized string = " << test << endl;
-
     cout << "EncryptionParameters: wrote " << size << " bytes" << endl;
 
-    char TestSend[size+1];
-    strcpy(TestSend, test.c_str());
-
-    for (int i = 0; i < size; i++) {
-        cout << TestSend[i];
-    }
-
+    cout << "Serialized string = " << test << endl;
+    
     cout << "\n";
     
+    //Server Parameters
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
     saddr.sin_addr.s_addr = INADDR_ANY;
     saddr.sin_port = htons(PORT);
 
-    //Client variables
+    //Connecting Client Parameters
     struct sockaddr_in caddr;
     socklen_t caddrSize = sizeof(caddr);
     int socketClient;
@@ -111,11 +104,11 @@ int main (int argc, const char * argv[]){
 
         //Receive or Send data 
         cout << "[Server] Sending Encryption Parameters\n";
-        send(socketClient, TestSend, size+1, 0);
+        send(socketClient, test.data(), size+1, 0);
 
         // Test conversion and deserialization
-        string outTest = convertChar2String(TestSend);
-        cout << "Output String " << outTest;
+        //string outTest = convertChar2String(TestSend);
+        //cout << "Output String " << outTest;
 
         /*
         sk_stream << outTest;
