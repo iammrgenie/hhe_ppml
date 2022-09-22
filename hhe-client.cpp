@@ -54,6 +54,7 @@ int main (int argc, const char * argv[]){
     cout << "[Client] Receiving Encryption Parameters\n";
     string s;
     int n;
+    
     while ((n = recv(clientSocket, TestRecv, sizeof(TestRecv), 0)) > 0 )
         s.append(TestRecv, TestRecv + n);
 
