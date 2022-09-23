@@ -153,7 +153,7 @@ int main () {
     vector<uint64_t> x_plain_1 = {0x10};
 
     //Encrypt plaintext with the set key
-    ANALYST.c_i = ENC.encrypt(x_1);
+    ANALYST.c_i = ENC.encrypt(x_plain_1);
 
     //HE Evaluation with Evaluation Key and store in C_2
     cout << "Evaluating using Square operation .... \n" << flush;
