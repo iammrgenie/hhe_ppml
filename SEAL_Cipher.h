@@ -64,11 +64,8 @@ class SEALZpCipher {
                                                            uint64_t plain_mod,
                                                            int seclevel = 128);
   virtual void encrypt_key(bool batch_encoder = false) = 0;
-  virtual std::vector<seal::Ciphertext> HE_decrypt(
-      std::vector<uint64_t>& ciphertext, bool batch_encoder = false) = 0;
-  virtual std::vector<uint64_t> decrypt_result(
-      std::vector<seal::Ciphertext>& ciphertext,
-      bool batch_encoder = false) = 0;
+  virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<uint64_t>& ciphertext, bool batch_encoder = false) = 0;
+  virtual std::vector<uint64_t> decrypt_result(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false) = 0;
   virtual void add_gk_indices() = 0;
 
   void activate_bsgs(bool activate);
@@ -97,21 +94,15 @@ class SEALZpCipher {
               const std::vector<seal::Ciphertext>& vi, const vector& b,
               bool batch_encoder = false);
   // vo = M * vi + b
-  void affine(std::vector<seal::Ciphertext>& vo, const matrix& M,
-              const std::vector<seal::Ciphertext>& vi, const vector& b,
-              bool batch_encoder = false);
-  void square(std::vector<seal::Ciphertext>& vo,
-              const std::vector<seal::Ciphertext>& vi);
+  void affine(std::vector<seal::Ciphertext>& vo, const matrix& M, const std::vector<seal::Ciphertext>& vi, const vector& b, bool batch_encoder = false);
+  void square(std::vector<seal::Ciphertext>& vo, const std::vector<seal::Ciphertext>& vi);
 
   // packed
   void packed_encrypt(seal::Ciphertext& out, std::vector<uint64_t> in);
-  void packed_decrypt(seal::Ciphertext& in, std::vector<uint64_t>& out,
-                      size_t size);
+  void packed_decrypt(seal::Ciphertext& in, std::vector<uint64_t>& out, size_t size);
   // vo = M * vi
-  void packed_matMul(seal::Ciphertext& vo, const matrix& M,
-                     const seal::Ciphertext& vi);
+  void packed_matMul(seal::Ciphertext& vo, const matrix& M, const seal::Ciphertext& vi);
   // vo = M * vi + b
-  void packed_affine(seal::Ciphertext& vo, const matrix& M,
-                     const seal::Ciphertext& vi, const vector& b);
+  void packed_affine(seal::Ciphertext& vo, const matrix& M, const seal::Ciphertext& vi, const vector& b);
   void packed_square(seal::Ciphertext& vo, const seal::Ciphertext& vi);
 };

@@ -46,12 +46,14 @@ link_directories(/usr/local/lib)
 #add_executable(hhe-client hhe-client.cpp)
 add_executable(hhe-test)                            #Checking the PASTA implementation
 
+
 target_sources(hhe-test
         PRIVATE
-            pasta_check.cpp
+            pasta_simple_test.cpp
             SEAL_Cipher.cpp
             pasta_3_seal.cpp
             pasta_3_plain.cpp
+            pasta_functions.cpp
 )
 
 #target_link_libraries(hhe-client SEAL::seal)
