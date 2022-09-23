@@ -15,6 +15,17 @@ constexpr ZpCipherParams new_PARAMS = {256, 128, 128};
 constexpr uint64_t newT = new_PARAMS.plain_size;
 size_t new_slots;
 
+struct commData {
+    vector<uint64_t> x_i;
+    vector<uint64_t> c_i;
+    vector<Ciphertext> c_1;
+    vector<Ciphertext> c_2;
+    vector<uint64_t> x_p;
+};
+
+//PASTA functions simplified
+
+//Encryption Key with HE
 vector<Ciphertext> encrypt_skey(bool batch_encoder, SEALContext con, PublicKey he_pk, vector<uint64_t> in_key) {
     vector<Ciphertext> outcipher;
     BatchEncoder B(con);
@@ -37,7 +48,19 @@ vector<Ciphertext> encrypt_skey(bool batch_encoder, SEALContext con, PublicKey h
     return outcipher;
 }
 
+//Square Evaluation with HE
+void HEsquare(vector<Ciphertext>& vo, const vector<Ciphertext>& vi, Evaluator eval, RelinKeys he_rlk) {
+    size_t rows = vi.size();
+    if (vo.size() != rows) vo.resize(rows);
+
+    for (size_t row = 0; row < rows; row++) {
+        eval.square(vi[row], vo[row]);
+        eval.relinearize_inplace(vo[row], he_rlk);
+    }
+}
+
 int main () {
+    commData ANALYST;
     //Random Symmetric Key
     vector<uint64_t> in_key = {0x07a30, 0x0cfe2, 0x03bbb, 0x06ab7, 0x0de0b, 0x0c36c, 0x01c39, 0x019e0,
                                       0x0e09c, 0x04441, 0x0c560, 0x00fd4, 0x0c611, 0x0a3fd, 0x0d408, 0x01b17,
@@ -110,12 +133,32 @@ int main () {
     keygen.create_public_key(he_pk);
 
     //Encryptor encryptor(context, he_pk);
-    Evaluator evaluator(context);
-    //Decryptor decryptor(context, he_sk);
+    Evaluator eval(context);
+    
+    RelinKeys he_rlk;
+    keygen.create_relin_keys(he_rlk);
 
+    //Encrypt the secret key with HE
+    cout << "\nUsing HE to encrypt the generated key ...\n" << flush;
     vector<Ciphertext> EncryptedSKey = encrypt_skey(USE_BATCH, context, he_pk, in_key);
 
     //utils::print_vector("Encrypted Key: ", EncryptedSKey, cerr);
+
+    //Initiate the Class for Encryption and Decryption using PASTA Symmetric Key for Encryption and Decryption
+    PASTA_3::PASTA ENC(in_key, plain_mod);
+
+    //Set dummy plaintext and test encryption and decryption
+    //vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
+    //vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
+    vector<uint64_t> x_plain_1 = {0x10};
+
+    //Encrypt plaintext with the set key
+    ANALYST.c_i = ENC.encrypt(x_1);
+
+    //HE Evaluation with Evaluation Key and store in C_2
+    cout << "Evaluating using Square operation .... \n" << flush;
+    HEsquare(ANALYST.c_1, ANALYST.c_i, eval, he_rlk);
+    cout << "Squaring Complete \n";
 
 
     return 0;
