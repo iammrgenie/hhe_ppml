@@ -42,14 +42,14 @@ add_subdirectory(util)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 
-#add_executable(hhe-server hhe-server.cpp)
-#add_executable(hhe-client hhe-client.cpp)
-add_executable(hhe-test)                            #Checking the PASTA implementation
+# add_executable(hhe-server hhe-server.cpp)
+# add_executable(hhe-client hhe-client.cpp)
+add_executable(hhe-analyst analyst.cpp)                            #Checking the PASTA implementation
+# add_executable(hhe-test)                            #Checking the PASTA implementation
 
-
-target_sources(hhe-test
+target_sources(hhe-analyst
         PRIVATE
-            pasta_simple_test.cpp
+            analyst.cpp            
             SEAL_Cipher.cpp
             pasta_3_seal.cpp
             pasta_3_plain.cpp
@@ -59,4 +59,5 @@ target_sources(hhe-test
 #target_link_libraries(hhe-client SEAL::seal_shared) # for Mac
 #target_link_libraries(hhe-server SEAL::seal)
 #target_link_libraries(hhe-server SEAL::seal_shared) # for Mac
-target_link_libraries(hhe-test SEAL::seal keccak aes)
+# target_link_libraries(hhe-test SEAL::seal keccak aes)
+target_link_libraries(hhe-analyst SEAL::seal keccak aes)

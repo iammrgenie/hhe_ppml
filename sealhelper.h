@@ -214,3 +214,11 @@ inline std::string uint64_to_hex_string(std::uint64_t value)
 {
     return seal::util::uint_to_hex_string(&value, std::size_t(1));
 }
+
+inline void print_vec(std::vector<int64_t> const &input, uint size)
+{
+    for (int i = 0; i < size; i++) {
+        std::cout << input.at(i) << ' ';
+    }
+    std::cout << std::endl;
+}
