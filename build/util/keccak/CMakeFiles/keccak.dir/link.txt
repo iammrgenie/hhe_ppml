@@ -1,2 +1,0 @@
-/bin/ar qc libkeccak.a CMakeFiles/keccak.dir/KeccakSpongeWidth1600.c.o CMakeFiles/keccak.dir/KeccakHash.c.o "CMakeFiles/keccak.dir/avx2/KeccakP-1600-AVX2.s.o"
-/bin/ranlib libkeccak.a

@@ -1,2 +1,0 @@
-/bin/ar qc libperf.a CMakeFiles/perf.dir/perf.c.o
-/bin/ranlib libperf.a
