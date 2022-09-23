@@ -53,7 +53,6 @@ target_sources(hhe-test
             SEAL_Cipher.cpp
             pasta_3_seal.cpp
             pasta_3_plain.cpp
-            pasta_functions.cpp
 )
 
 #target_link_libraries(hhe-client SEAL::seal)

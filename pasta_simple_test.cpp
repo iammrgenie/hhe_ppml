@@ -2,18 +2,40 @@
 #include <iostream>
 #include <string>
 
-#include "SEAL_Cipher.h"
-#include "utils.h"
-#include "pasta_3_plain.h"  // for PASTA_params
-
 #include "pasta_3_seal.h"
 #include "sealhelper.h"
-#include "pasta_functions.h"
-
-static const bool USE_BATCH = true;
+#include "SEAL_Cipher.h"
+#include "pasta_3_plain.h"  // for PASTA_params
 
 using namespace std;
 using namespace seal;
+
+static const bool USE_BATCH = true;
+constexpr ZpCipherParams new_PARAMS = {256, 128, 128};
+constexpr uint64_t newT = new_PARAMS.plain_size;
+size_t new_slots;
+
+vector<Ciphertext> encrypt_skey(bool batch_encoder, SEALContext con, PublicKey he_pk, vector<uint64_t> in_key) {
+    vector<Ciphertext> outcipher;
+    BatchEncoder B(con);
+    Encryptor E(con, he_pk);
+    
+    (void)batch_encoder;  // patched implementation: ignore param
+    outcipher.resize(1);
+    
+    Plaintext k;
+    vector<uint64_t> key_tmp(new_slots + newT, 0);
+    
+    for (size_t i = 0; i < newT; i++) {
+        key_tmp[i] = in_key[i];
+        key_tmp[i + new_slots] = in_key[i + newT];
+    }
+    
+    B.encode(key_tmp, k);
+    E.encrypt(k, outcipher[0]);
+
+    return outcipher;
+}
 
 int main () {
     //Random Symmetric Key
@@ -79,22 +101,21 @@ int main () {
     parms.set_coeff_modulus(seal::CoeffModulus::BFVDefault(mod_degree));
     }
     parms.set_plain_modulus(plain_mod);
-    auto context = make_shared<seal::SEALContext>(parms, true, sec);
+    SEALContext context(parms, true, sec);
 
-    KeyGenerator keygen(*context);
+    KeyGenerator keygen(context);
     SecretKey he_sk = keygen.secret_key();
     
     PublicKey he_pk;
     keygen.create_public_key(he_pk);
 
-    Encryptor encryptor(*context, he_pk);
-    Evaluator evaluator(*context);
-    Decryptor decryptor(*context, he_sk);
-    BatchEncoder batch_encoder(*context);
+    //Encryptor encryptor(context, he_pk);
+    Evaluator evaluator(context);
+    //Decryptor decryptor(context, he_sk);
 
-    vector<Ciphertext> EncryptedSKey = encrypt_key(USE_BATCH, encryptor, batch_encoder, in_key);
+    vector<Ciphertext> EncryptedSKey = encrypt_skey(USE_BATCH, context, he_pk, in_key);
 
-    utils::print_vector("Encrypted Key: ", EncryptedSKey, cerr);
+    //utils::print_vector("Encrypted Key: ", EncryptedSKey, cerr);
 
 
     return 0;

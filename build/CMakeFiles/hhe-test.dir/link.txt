@@ -1,0 +1,1 @@
+/bin/c++ "CMakeFiles/hhe-test.dir/pasta_simple_test.cpp.o" "CMakeFiles/hhe-test.dir/SEAL_Cipher.cpp.o" "CMakeFiles/hhe-test.dir/pasta_3_seal.cpp.o" "CMakeFiles/hhe-test.dir/pasta_3_plain.cpp.o" -o hhe-test   -L/usr/local/lib  -Wl,-rpath,/usr/local/lib /usr/local/lib/libseal-4.0.a util/keccak/libkeccak.a util/aes/libaes.a -pthread 
