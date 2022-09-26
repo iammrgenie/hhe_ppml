@@ -142,7 +142,7 @@ int main () {
     cout << "\nUsing HE to encrypt the generated key ...\n" << flush;
     vector<Ciphertext> EncryptedSKey = encrypt_skey(USE_BATCH, context, he_pk, in_key);
 
-    //utils::print_vector("Encrypted Key: ", EncryptedSKey, cerr);
+    // utils::print_vector("Encrypted Key: ", EncryptedSKey, cerr);
 
     //Initiate the Class for Encryption and Decryption using PASTA Symmetric Key for Encryption and Decryption
     PASTA_3::PASTA ENC(in_key, plain_mod);
@@ -150,15 +150,19 @@ int main () {
     //Set dummy plaintext and test encryption and decryption
     //vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
     //vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
-    vector<uint64_t> x_plain_1 = {0x10};
+    vector<uint64_t> x_plain_1 = {0x10, 0x10};
+    cout << "\nPlaintext user input: " << endl;
+    print_vec(x_plain_1, x_plain_1.size());
 
-    //Encrypt plaintext with the set key
+    //Encrypt plaintext with the secret key
+    cout << "\nSymmetrically encrypt the user input ..." << endl;
     ANALYST.c_i = ENC.encrypt(x_plain_1);
+    print_vec(ANALYST.c_i, ANALYST.c_i.size(), "c_i");
 
     //HE Evaluation with Evaluation Key and store in C_2
     cout << "Evaluating using Square operation .... \n" << flush;
-    HEsquare(ANALYST.c_1, ANALYST.c_i, eval, he_rlk);
-    cout << "Squaring Complete \n";
+    // HEsquare(ANALYST.c_1, ANALYST.c_i, eval, he_rlk);
+    // cout << "Squaring Complete \n";
 
 
     return 0;

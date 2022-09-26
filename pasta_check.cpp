@@ -15,16 +15,24 @@ using namespace std;
 using namespace seal;
 
 struct UserData {
-    vector<uint64_t> x_i;
+    vector<uint64_t> x_i{0, 1, 2, 3};
     vector<uint64_t> c_i;
     vector<seal::Ciphertext> c_1;
     vector<seal::Ciphertext> c_2;
     vector<uint64_t> x_p;
 };
 
+struct AnalystData {  
+    vector<int64_t> w{17, 31, 24, 17};  // dummy weights for now
+    vector<int64_t> b{-5, -5, -5, -5};  // dummy biases for now
+    vector<seal::Ciphertext> w_c;
+    vector<seal::Ciphertext> b_c;
+};
+
 int main() {
     //int cnt = 2;
     UserData Test;
+    AnalystData Analyst;
     
     //Random Symmetric Key
     vector<uint64_t> in_key = {0x07a30, 0x0cfe2, 0x03bbb, 0x06ab7, 0x0de0b, 0x0c36c, 0x01c39, 0x019e0,
@@ -104,23 +112,27 @@ int main() {
     M1.create_gk();
 
     //Encrypt the secret key with HE
-    cout << "\nUsing HE to encrypt the generated key ...\n" << flush;
+    cout << "\nUsing HE to encrypt the user's symmetric key ..." << flush;
     M1.encrypt_key(USE_BATCH);
 
     //Set dummy plaintext and test encryption and decryption
-    //vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
-    //vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
-    vector<uint64_t> x_1 = {0x10};
-
-    //Encrypt plaintext with the set key
-    Test.c_i = EN.encrypt(x_1);
+    cout << "\nPlaintext user input: " << endl;
+    // vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
+    // vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
+    // vector<uint64_t> x_1 = {0x10};
+    print_vec(Test.x_i, Test.x_i.size(), "x_i");
+     
+    // //Encrypt plaintext with the set key
+    cout << "\nSymmetrically encrypt the user input ..." << endl;
+    Test.c_i = EN.encrypt(Test.x_i);
+    print_vec(Test.c_i, Test.c_i.size(), "c_i");
 
     //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
     cout << "\nDecomposing C' and C ...\n" << flush;
     Test.c_1 = M1.HE_decrypt(Test.c_i, USE_BATCH);
 
     //HE Evaluation with Evaluation Key and store in c_2
-    cout << "Evaluating using Square operation .... \n" << flush;
+    cout << "Evaluating an encrypted square .... \n" << flush;
     M1.square(Test.c_2, Test.c_1);
     cout << "Squaring Complete \n";
 
@@ -129,9 +141,8 @@ int main() {
     Test.x_p = M1.decrypt_result(Test.c_2, USE_BATCH);
       //utils::print_vector("Decrypted Decomposed Message: ", Test[i].x_p, cerr);
     
-    cout << "Decrypted square = ";
-    for (auto x: Test.x_p)
-        cout << x << ' ';
+    cout << "Decrypted square";
+    print_vec(Test.x_p, Test.x_i.size());
 
     cout << "\n";
 
