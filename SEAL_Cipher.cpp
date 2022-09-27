@@ -49,7 +49,7 @@ std::shared_ptr<seal::SEALContext> SEALZpCipher::create_context(
 }
 
 //----------------------------------------------------------------
-int SEALZpCipher::print_noise() { return print_noise(secret_key_encrypted); }
+//int SEALZpCipher::print_noise(std::vector<seal::Ciphertext>secret_key_encrypted) { return print_noise(secret_key_encrypted); }
 
 //----------------------------------------------------------------
 

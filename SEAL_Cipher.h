@@ -72,6 +72,7 @@ class SEALZpCipher {
 
   void print_parameters();
   int print_noise();
+  //int print_noise(std::vector<seal::Ciphertext>secret_key_encrypted);
   int print_noise(std::vector<seal::Ciphertext>& ciphs);
   int print_noise(seal::Ciphertext& ciph);
 

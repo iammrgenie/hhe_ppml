@@ -45,9 +45,9 @@ link_directories(/usr/local/lib)
 # add_executable(hhe-server hhe-server.cpp)
 # add_executable(hhe-client hhe-client.cpp)
 add_executable(hhe-analyst hhe-analyst.cpp)                            #Checking the PASTA implementation
-# add_executable(hhe-test)                            #Checking the PASTA implementation
+# add_executable(hhe-test)                                             #Checking the PASTA implementation
 add_executable(pasta-check pasta_check.cpp)                            #Checking the PASTA implementation
-add_executable(pasta-simple-test pasta_simple_test.cpp)                            #Checking the PASTA implementation
+add_executable(pasta-simple-test pasta_test_new.cpp)                   #Checking the PASTA implementation
 
 target_sources(hhe-analyst
         PRIVATE
@@ -67,7 +67,7 @@ target_sources(pasta-check
 
 target_sources(pasta-simple-test
         PRIVATE
-            pasta_simple_test.cpp            
+            pasta_test_new.cpp            
             SEAL_Cipher.cpp
             pasta_3_seal.cpp
             pasta_3_plain.cpp
