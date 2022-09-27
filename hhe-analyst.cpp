@@ -28,7 +28,8 @@ tuple<SecretKey, PublicKey, RelinKeys> generate_keys(SEALContext context) {
     return make_tuple(secret_key, public_key, relin_keys);
 }
 
-template <typename T> string save_stuff(T stuff) {
+template <typename T> 
+string save_stuff(T stuff) {
     stringstream stuff_stream;
     auto stuff_size = stuff.save(stuff_stream);
     string stuff_string = stuff_stream.str();
