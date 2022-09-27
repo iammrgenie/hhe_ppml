@@ -8,28 +8,29 @@
 #include <iostream>
 #include <sstream>
 
-#include <seal/seal.h>
+#include "pasta_3_seal.h"
 #include "sealhelper.h"
+#include "SEAL_Cipher.h"
+#include "pasta_3_plain.h"  // for PASTA_params
 
 using namespace std;
 using namespace seal;
 
 stringstream parms_stream;
 stringstream data_stream;
-stringstream sk_stream;
+stringstream pk_stream;
 
-string convertChar2String(char* in) {
-    string out(in);
-    return out;
-}
+static const bool USE_BATCH = true;
+
 
 int main (int argc, const char * argv[]){
+    seal::sec_level_type sec = seal::sec_level_type::tc128;
     
     int clientSocket, new_connection;
 	struct sockaddr_in server;
 
     //char client_message[4096], server_reply[4096];
-    char TestRecv[82];
+    char parms_char[102];
 
     //create socket
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -52,18 +53,18 @@ int main (int argc, const char * argv[]){
     cout << "[Client] Connected to Server\n";
 
     cout << "[Client] Receiving Encryption Parameters\n";
-    string s;
+    string parms_string;
     int n;
     
-    while ((n = recv(clientSocket, TestRecv, sizeof(TestRecv), 0)) > 0 )
-        s.append(TestRecv, TestRecv + n);
+    while ((n = recv(clientSocket, parms_char, sizeof(parms_char), 0)) > 0 )
+        parms_string.append(parms_char, parms_char + n);
 
-    cout << s << endl;
-
-    data_stream << s;
+    
+    //Deserialize from String to SEAL object
+    parms_stream << parms_string;
 
     EncryptionParameters parms;
-    parms.load(data_stream);
+    parms.load(parms_stream);
     SEALContext context(parms);
 
     print_parameters(context);
