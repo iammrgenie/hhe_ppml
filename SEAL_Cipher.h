@@ -62,8 +62,8 @@ class SEALZpCipher {
   static std::shared_ptr<seal::SEALContext> create_context(size_t mod_degree,
                                                            uint64_t plain_mod,
                                                            int seclevel = 128);
-  virtual void encrypt_key(bool batch_encoder = false) = 0;
-  virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<uint64_t>& ciphertext, bool batch_encoder = false) = 0;
+  virtual std::vector<seal::Ciphertext> encrypt_key(std::vector<uint64_t>& secret_key, bool batch_encoder = false) = 0;
+  virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<uint64_t>& ciphertext, std::vector<seal::Ciphertext>& secret_key_encrypted, bool batch_encoder = false) = 0;
   virtual std::vector<uint64_t> decrypt_result(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false) = 0;
   virtual void add_gk_indices() = 0;
 
