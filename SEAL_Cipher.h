@@ -38,7 +38,7 @@ class SEALZpCipher {
   size_t bsgs_n2;
 
  public:
-  SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk);
+  SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con);
 
   virtual ~SEALZpCipher() = default;
   // Size of the secret key in words
