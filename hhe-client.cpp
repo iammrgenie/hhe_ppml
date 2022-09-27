@@ -76,6 +76,7 @@ int main (int argc, const char * argv[]){
 
     //char client_message[4096], server_reply[4096];
     char parms_char[102];
+    char pk_char[2057156];
 
     //create socket
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -100,18 +101,29 @@ int main (int argc, const char * argv[]){
     cout << "[Client] Receiving Encryption Parameters\n";
     string parms_string;
     int n;
-    
     while ((n = recv(clientSocket, parms_char, sizeof(parms_char), 0)) > 0 )
         parms_string.append(parms_char, parms_char + n);
 
-    
-    //Deserialize from String to SEAL object
+    //Deserialize from Parms String to SEAL object
     parms_stream << parms_string;
 
     EncryptionParameters parms;
     parms.load(parms_stream);
     
-    auto context = make_shared<seal::SEALContext>(parms, true, sec);
+    SEALContext context(parms);
+    
+    cout << "[Client] Receiving Public Key from Server\n";
+    string pk_string;
+    int i;
+    while ((i = recv(clientSocket, pk_char, sizeof(pk_char), 0)) > 0 )
+        pk_string.append(pk_char, pk_char + n);
+    
+    //Deserialize from PK String to SEAL object
+    pk_stream << pk_string;
+
+    //Load Public Key
+    PublicKey he_pk;
+    he_pk.load(context, pk_stream);
 
     //Instantiate the PASTA object for symmetric encryption and decryption
     PASTA_3::PASTA USER_1(in_key, plain_mod);

@@ -78,6 +78,7 @@ int main (int argc, const char * argv[]){
     SecretKey he_sk = keygen.secret_key();      //HE Decryption Key
     PublicKey he_pk;                            //HE Encryption Key
     keygen.create_public_key(he_pk);
+    
 
     //Instantiate the PASTA object
     PASTA_3::PASTA_SEAL ANALYST_1(context, he_sk, he_pk);
@@ -88,7 +89,8 @@ int main (int argc, const char * argv[]){
     //Save and send HE public key
     auto pk_size = he_pk.save(pk_stream);
     string pk_string = pk_stream.str();
-    cout << "Encryption Parameters: wrote " << size << " bytes" << endl;
+    
+    cout << "Public Key: wrote " << pk_size << " bytes" << endl;
 
     
     //Socket Communication Section
@@ -149,6 +151,10 @@ int main (int argc, const char * argv[]){
         //Send the Encryption Parameters
         cout << "[Server] Sending Encryption Parameters to Connected Client\n";
         send(socketClient, parms_string.data(), size+1, 0);
+
+        //Send the Public Key
+        cout << "[Server] Sending Public Key to Connected Client\n";
+        send(socketClient, pk_string.data(), pk_size+1, 0);
 
         close(socketClient);
     }
