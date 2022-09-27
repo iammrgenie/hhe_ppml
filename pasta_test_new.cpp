@@ -89,13 +89,55 @@ int main () {
     auto context = make_shared<seal::SEALContext>(parms, true, sec);
 
     //Encryption Parameters
-    //KeyGenerator keygen(*context);
-    //SecretKey he_sk = keygen.secret_key();      //HE Decryption Key
-    //PublicKey he_pk;                            //HE Encryption Key
-    //keygen.create_public_key(he_pk);
+    KeyGenerator keygen(*context);
+    SecretKey he_sk = keygen.secret_key();      //HE Decryption Key
+    PublicKey he_pk;                            //HE Encryption Key
+    keygen.create_public_key(he_pk);
 
     //Instantiate the PASTA object
-    PASTA_3::PASTA_SEAL ANALYST_1(context);
+    PASTA_3::PASTA_SEAL ANALYST_1(context, he_sk, he_pk);
+
+    //Instantiate the PASTA object for symmetric encryption and decryption
+    PASTA_3::PASTA USER_1(in_key, plain_mod);
+
+    //Print the necessary parameters to screen
+    ANALYST_1.print_parameters();
+
+    //compute the HE encryption of the secret key and measure performance
+    ANALYST_1.activate_bsgs(false);
+    ANALYST_1.add_gk_indices();
+    ANALYST_1.create_gk();
+
+    //Encrypt the Symmetric Key with HE
+    cout << "\nUsing HE to encrypt the user's symmetric key ...\n" << flush;
+    vector<seal::Ciphertext>Encrypted_key;
+    Encrypted_key = ANALYST_1.encrypt_key(in_key, USE_BATCH);
+
+    //Set dummy plaintext and test encryption and decryption
+    cout << "\nPlaintext user input: " << endl;
+    // vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
+    // vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
+    vector<uint64_t> x_1 = {0x10};
+    print_vec(x_1, x_1.size(), "x_1");
+
+    //Encrypt plaintext with the set key
+    cout << "\nSymmetrically encrypt the user input ..." << endl;
+    Test.c_i = USER_1.encrypt(x_1);
+    print_vec(Test.c_i, Test.c_i.size(), "c_i");
+
+    //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
+    cout << "\nDecomposing C' and C ...\n" << flush;
+    Test.c_1 = ANALYST_1.HE_decrypt(Test.c_i, Encrypted_key, USE_BATCH);
+
+    //HE Evaluation with Evaluation Key and store in c_2
+    cout << "Evaluating an encrypted square .... \n" << flush;
+    ANALYST_1.square(Test.c_2, Test.c_1);
+    cout << "Squaring Complete \n";
+
+    //Decrypt the Decomposed Ciphertext by the Analyst
+    cout << "\nDecryption of Final Message using SK ...\n" << flush;
+    Test.x_p = ANALYST_1.decrypt_result(Test.c_2, USE_BATCH);
+    print_vec(Test.x_p, Test.x_p.size(), "Squared Res");
 
     return 0;
 }

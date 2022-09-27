@@ -52,7 +52,7 @@ std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<uint64_t>& ciphertext
         sbox_cube(state);
       else
         sbox_feistel(state);
-      print_noise(state);
+      //print_noise(state);
     }
 
     std::cout << "final add" << std::endl;
