@@ -4,23 +4,17 @@ using namespace seal;
 
 namespace PASTA_3 {
 
-std::vector<seal::Ciphertext> PASTA_SEAL::encrypt_key(bool batch_encoder, std::vector<uint64_t> secret_key) {
-  std::vector<seal::Ciphertext> secret_key_encrypted;
-
+void PASTA_SEAL::encrypt_key(bool batch_encoder) {
   (void)batch_encoder;  // patched implementation: ignore param
   secret_key_encrypted.resize(1);
   Plaintext k;
   std::vector<uint64_t> key_tmp(halfslots + PASTA_T, 0);
-
   for (size_t i = 0; i < PASTA_T; i++) {
     key_tmp[i] = secret_key[i];
     key_tmp[i + halfslots] = secret_key[i + PASTA_T];
   }
   this->batch_encoder.encode(key_tmp, k);
-  
   encryptor.encrypt(k, secret_key_encrypted[0]);
-
-  return secret_key_encrypted;
 }
 
 //----------------------------------------------------------------
