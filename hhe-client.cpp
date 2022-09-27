@@ -33,6 +33,7 @@ struct commData {
 
 int main (int argc, const char * argv[]){
     commData user1;
+    uint64_t plain_mod = 65537;
     seal::sec_level_type sec = seal::sec_level_type::tc128;
 
     //Random Symmetric Key
@@ -113,7 +114,7 @@ int main (int argc, const char * argv[]){
     auto context = make_shared<seal::SEALContext>(parms, true, sec);
 
     //Instantiate the PASTA object for symmetric encryption and decryption
-    PASTA_3::PASTA USER_1(in_key, parms.plain_modulus);
+    PASTA_3::PASTA USER_1(in_key, plain_mod);
 
     //Set dummy plaintext and test encryption and decryption
     cout << "\nPlaintext user input: " << endl;
