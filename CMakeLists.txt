@@ -45,8 +45,8 @@ link_directories(/usr/local/lib)
 # add_executable(hhe-server hhe-server.cpp)
 # add_executable(hhe-client hhe-client.cpp)
 add_executable(hhe-analyst hhe-analyst.cpp)                            #Checking the PASTA implementation
-# add_executable(hhe-test)                                             #Checking the PASTA implementation
-add_executable(pasta-check pasta_check.cpp)                            #Checking the PASTA implementation
+#add_executable(hhe-test)                                             #Checking the PASTA implementation
+#add_executable(pasta-check pasta_check.cpp)                            #Checking the PASTA implementation
 add_executable(pasta-simple-test pasta_test_new.cpp)                   #Checking the PASTA implementation
 
 target_sources(hhe-analyst
@@ -57,13 +57,13 @@ target_sources(hhe-analyst
             pasta_3_plain.cpp
 )
 
-target_sources(pasta-check
-        PRIVATE
-            pasta_check.cpp            
-            SEAL_Cipher.cpp
-            pasta_3_seal.cpp
-            pasta_3_plain.cpp
-)
+#target_sources(pasta-check
+#        PRIVATE
+#            pasta_check.cpp            
+#            SEAL_Cipher.cpp
+#            pasta_3_seal.cpp
+#            pasta_3_plain.cpp
+#)
 
 target_sources(pasta-simple-test
         PRIVATE
@@ -79,5 +79,5 @@ target_sources(pasta-simple-test
 #target_link_libraries(hhe-server SEAL::seal_shared) # for Mac
 # target_link_libraries(hhe-test SEAL::seal keccak aes)
 target_link_libraries(hhe-analyst SEAL::seal keccak aes)
-target_link_libraries(pasta-check SEAL::seal keccak aes)
+#target_link_libraries(pasta-check SEAL::seal keccak aes)
 target_link_libraries(pasta-simple-test SEAL::seal keccak aes)

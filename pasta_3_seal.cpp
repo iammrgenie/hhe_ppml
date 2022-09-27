@@ -4,7 +4,7 @@ using namespace seal;
 
 namespace PASTA_3 {
 
-std::vector<seal::Ciphertext> PASTA_SEAL::encrypt_key(bool batch_encoder, std::vector<uint64_t>& secret_key) {
+std::vector<seal::Ciphertext> PASTA_SEAL::encrypt_key(std::vector<uint64_t>& secret_key, bool batch_encoder) {
   std::vector<seal::Ciphertext> secret_key_encrypted;
 
   (void)batch_encoder;  // patched implementation: ignore param
@@ -25,7 +25,7 @@ std::vector<seal::Ciphertext> PASTA_SEAL::encrypt_key(bool batch_encoder, std::v
 
 //----------------------------------------------------------------
 
-std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<uint64_t>& ciphertexts, bool batch_encoder, std::vector<seal::Ciphertext>& secret_key_encrypted) {
+std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<uint64_t>& ciphertexts, std::vector<seal::Ciphertext>& secret_key_encrypted, bool batch_encoder) {
   (void)batch_encoder;  // patched implementation: ignore param
 
   uint64_t nonce = 123456789;

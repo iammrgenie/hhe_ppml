@@ -89,7 +89,7 @@ int main () {
     auto context = make_shared<seal::SEALContext>(parms, true, sec);
 
     //Encryption Parameters
-    KeyGenerator keygen(context);
+    KeyGenerator keygen(*context);
     SecretKey he_sk = keygen.secret_key();      //HE Decryption Key
     PublicKey he_pk;                            //HE Encryption Key
     keygen.create_public_key(he_pk);
