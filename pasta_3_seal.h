@@ -8,11 +8,8 @@ namespace PASTA_3 {
 class PASTA_SEAL : public SEALZpCipher {
  public:
   typedef PASTA Plain;
-  PASTA_SEAL(std::vector<uint64_t> secret_key,
-             std::shared_ptr<seal::SEALContext> con)
-      : SEALZpCipher(PASTA_PARAMS, secret_key, con),
-        slots(this->batch_encoder.slot_count()),
-        halfslots(slots >> 1) {}
+  PASTA_SEAL(std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk)
+      : SEALZpCipher(PASTA_PARAMS, con, he_sk, he_pk), slots(this->batch_encoder.slot_count()), halfslots(slots >> 1) {}
 
   virtual ~PASTA_SEAL() = default;
 

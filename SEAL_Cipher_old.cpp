@@ -3,22 +3,25 @@
 #include <algorithm>
 #include <iostream>
 
-SEALZpCipher::SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk)
-    : params(params),
+SEALZpCipher::SEALZpCipher(ZpCipherParams params, std::vector<uint64_t> secret_key, std::shared_ptr<seal::SEALContext> con)
+    : secret_key(secret_key),
+      params(params),
       context(con),
       keygen(*context),
-      he_sk(he_sk),
-      he_pk(he_pk),
+      he_sk(keygen.secret_key()),
       encryptor(*context, he_sk),
       evaluator(*context),
       decryptor(*context, he_sk),
       batch_encoder(*context) {
-        keygen.create_relin_keys(he_rk);
-        //keygen.create_public_key(he_pk);
-        encryptor.set_public_key(he_pk);
+  if (secret_key.size() != params.key_size)
+    throw std::runtime_error("Invalid Key length");
 
-        mod_degree = context->first_context_data()->parms().poly_modulus_degree();
-        plain_mod = context->first_context_data()->parms().plain_modulus().value();
+  keygen.create_relin_keys(he_rk);
+  keygen.create_public_key(he_pk);
+  encryptor.set_public_key(he_pk);
+
+  mod_degree = context->first_context_data()->parms().poly_modulus_degree();
+  plain_mod = context->first_context_data()->parms().plain_modulus().value();
 }
 
 std::shared_ptr<seal::SEALContext> SEALZpCipher::create_context(

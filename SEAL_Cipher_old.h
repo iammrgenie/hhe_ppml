@@ -11,12 +11,12 @@ class SEALZpCipher {
   typedef std::vector<std::vector<uint64_t>> matrix;
 
  protected:
-  //std::vector<uint64_t> secret_key;
+  std::vector<uint64_t> secret_key;
   ZpCipherParams params;
   uint64_t plain_mod;
   uint64_t mod_degree;
 
-  //std::vector<seal::Ciphertext> secret_key_encrypted;
+  std::vector<seal::Ciphertext> secret_key_encrypted;
 
   std::shared_ptr<seal::SEALContext> context;
   seal::KeyGenerator keygen;
@@ -38,7 +38,8 @@ class SEALZpCipher {
   size_t bsgs_n2;
 
  public:
-  SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk);
+  SEALZpCipher(ZpCipherParams params, std::vector<uint64_t> secret_key,
+               std::shared_ptr<seal::SEALContext> con);
 
   virtual ~SEALZpCipher() = default;
   // Size of the secret key in words
