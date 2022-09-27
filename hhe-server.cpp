@@ -9,41 +9,81 @@
 #include <iostream>
 #include <sstream>
 
-#include <seal/seal.h>
+#include "pasta_3_seal.h"
 #include "sealhelper.h"
+#include "SEAL_Cipher.h"
+#include "pasta_3_plain.h"  // for PASTA_params
 
 using namespace std;
 using namespace seal;
+
+static const bool USE_BATCH = true;
 
 #define PORT 5000
 
 stringstream parms_stream;
 stringstream data_stream;
-stringstream sk_stream;
+stringstream pk_stream;
 
-string convertChar2String(char* in) {
-    string out(in);
-    return out;
-}
+struct commData {
+    vector<uint64_t> x_i;
+    vector<uint64_t> c_i;
+    vector<Ciphertext> c_1;
+    vector<Ciphertext> c_2;
+    vector<uint64_t> x_p;
+};
 
 
 int main (int argc, const char * argv[]){
+    commData Server1;
 
-    //SEAL HE Parameters
-    EncryptionParameters parms(scheme_type::ckks);
-    size_t poly_modulus_degree = 8192;
-    parms.set_poly_modulus_degree(poly_modulus_degree);
-    parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, {50, 30, 50}));
+    //Set the SEAL Homorphic Parameters
+  	uint64_t plain_mod = 65537;
+  	uint64_t mod_degree = 16384;
+  	int seclevel = 128;
 
-    SEALContext context(parms);
-    print_parameters(context);
-    cout << "\n";
+    if (seclevel != 128) throw runtime_error("Security Level not supported");
+    seal::sec_level_type sec = seal::sec_level_type::tc128;
 
-    //Convert the parameters to a string for communication
+    seal::EncryptionParameters parms(seal::scheme_type::bfv);
+    parms.set_poly_modulus_degree(mod_degree);
+
+    if (mod_degree == 65536) {
+        sec = seal::sec_level_type::none;
+        parms.set_coeff_modulus(
+            {0xffffffffffc0001, 0xfffffffff840001, 0xfffffffff6a0001,
+             0xfffffffff5a0001, 0xfffffffff2a0001, 0xfffffffff240001,
+             0xffffffffefe0001, 0xffffffffeca0001, 0xffffffffe9e0001,
+             0xffffffffe7c0001, 0xffffffffe740001, 0xffffffffe520001,
+             0xffffffffe4c0001, 0xffffffffe440001, 0xffffffffe400001,
+             0xffffffffdda0001, 0xffffffffdd20001, 0xffffffffdbc0001,
+             0xffffffffdb60001, 0xffffffffd8a0001, 0xffffffffd840001,
+             0xffffffffd6e0001, 0xffffffffd680001, 0xffffffffd2a0001,
+             0xffffffffd000001, 0xffffffffcf00001, 0xffffffffcea0001,
+             0xffffffffcdc0001, 0xffffffffcc40001});  // 1740 bits
+    } else {
+    parms.set_coeff_modulus(seal::CoeffModulus::BFVDefault(mod_degree));
+    }
+    parms.set_plain_modulus(plain_mod);
+    auto context = make_shared<seal::SEALContext>(parms, true, sec);
+
+    //Convert Encryption parameters to a string for communication
     auto size = parms.save(parms_stream);
     string parms_string = parms_stream.str();
     
-    cout << "EncryptionParameters: wrote " << size << " bytes" << endl;
+    cout << "Encryption Parameters: wrote " << size << " bytes" << endl;
+
+    //Use Encryption Parameters for the Analyst
+    KeyGenerator keygen(*context);
+    SecretKey he_sk = keygen.secret_key();      //HE Decryption Key
+    PublicKey he_pk;                            //HE Encryption Key
+    keygen.create_public_key(he_pk);
+
+    //Instantiate the PASTA object
+    PASTA_3::PASTA_SEAL ANALYST_1(context, he_sk, he_pk);
+
+    //Print the necessary parameters to screen
+    ANALYST_1.print_parameters();
     
     //Socket Communication Section
     //Server Parameters
@@ -100,7 +140,7 @@ int main (int argc, const char * argv[]){
             std::cout << " --> " << hostClient << " connected to port " << ntohs(caddr.sin_port) << std::endl;
         }
 
-        //Receive or Send data 
+        //Receive or Send the Encryption Parameters
         cout << "[Server] Sending Encryption Parameters\n";
         send(socketClient, parms_string.data(), size+1, 0);
 
