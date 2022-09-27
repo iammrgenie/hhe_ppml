@@ -3,17 +3,18 @@
 #include <algorithm>
 #include <iostream>
 
-SEALZpCipher::SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con)
+SEALZpCipher::SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk)
     : params(params),
       context(con),
       keygen(*context),
-      he_sk(keygen.secret_key()),
+      he_sk(he_sk),
+      he_pk(he_pk),
       encryptor(*context, he_sk),
       evaluator(*context),
       decryptor(*context, he_sk),
       batch_encoder(*context) {
     keygen.create_relin_keys(he_rk);
-    keygen.create_public_key(he_pk);
+    //keygen.create_public_key(he_pk);
     encryptor.set_public_key(he_pk);
 
     mod_degree = context->first_context_data()->parms().poly_modulus_degree();
