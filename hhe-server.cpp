@@ -84,6 +84,12 @@ int main (int argc, const char * argv[]){
 
     //Print the necessary parameters to screen
     ANALYST_1.print_parameters();
+
+    //Save and send HE public key
+    auto pk_size = he_pk.save(pk_stream);
+    string pk_string = pk_stream.str();
+    cout << "Encryption Parameters: wrote " << size << " bytes" << endl;
+
     
     //Socket Communication Section
     //Server Parameters

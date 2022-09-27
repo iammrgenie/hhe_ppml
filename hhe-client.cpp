@@ -127,6 +127,8 @@ int main (int argc, const char * argv[]){
     cout << "\nSymmetrically encrypt the user input ..." << endl;
     user1.c_i = USER_1.encrypt(x_1);
     print_vec(user1.c_i, user1.c_i.size(), "c_i");
+
+    //Encrypt Symmetric Key with HE pk
    
     close(clientSocket);
     return 0;
