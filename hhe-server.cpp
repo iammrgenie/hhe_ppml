@@ -140,8 +140,8 @@ int main (int argc, const char * argv[]){
             std::cout << " --> " << hostClient << " connected to port " << ntohs(caddr.sin_port) << std::endl;
         }
 
-        //Receive or Send the Encryption Parameters
-        cout << "[Server] Sending Encryption Parameters\n";
+        //Send the Encryption Parameters
+        cout << "[Server] Sending Encryption Parameters to Connected Client\n";
         send(socketClient, parms_string.data(), size+1, 0);
 
         close(socketClient);
