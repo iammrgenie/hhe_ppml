@@ -99,6 +99,21 @@ std::vector<uint64_t> PASTA_SEAL::decrypt_result(
 
 //----------------------------------------------------------------
 
+std::vector<int64_t> PASTA_SEAL::decrypt_result_int(
+    std::vector<Ciphertext>& ciphertext, bool batch_encoder) {
+  (void)batch_encoder;  // patched implementation: ignore param
+  Plaintext p;
+  std::vector<int64_t> res;
+  decryptor.decrypt(ciphertext[0], p);
+  this->batch_encoder.decode(p, res);
+  res.resize(params.plain_size);
+  return res;
+}
+
+
+
+//----------------------------------------------------------------
+
 void PASTA_SEAL::add_gk_indices() {
   gk_indices.push_back(0);
   gk_indices.push_back(-1);

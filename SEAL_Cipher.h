@@ -47,6 +47,8 @@ class SEALZpCipher {
   size_t get_plain_size() const { return params.plain_size; }
   // Size of a plaintext block in words
   size_t get_cipher_size() const { return params.cipher_size; }
+  
+  // seal::Evaluator get_evaluator() const { return evaluator; }
 
   void add_some_gk_indices(std::vector<int>& gk_ind);
   void add_bsgs_indices(uint64_t bsgs_n1, uint64_t bsgs_n2);
@@ -65,6 +67,7 @@ class SEALZpCipher {
   virtual std::vector<seal::Ciphertext> encrypt_key(std::vector<uint64_t>& secret_key, bool batch_encoder = false) = 0;
   virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<uint64_t>& ciphertext, std::vector<seal::Ciphertext>& secret_key_encrypted, bool batch_encoder = false) = 0;
   virtual std::vector<uint64_t> decrypt_result(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false) = 0;
+  virtual std::vector<int64_t> decrypt_result_int(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false) = 0;
   virtual void add_gk_indices() = 0;
 
   void activate_bsgs(bool activate);
@@ -98,11 +101,14 @@ class SEALZpCipher {
   void square(std::vector<seal::Ciphertext>& vo, const std::vector<seal::Ciphertext>& vi);
 
   // packed
-  void packed_encrypt(seal::Ciphertext& out, std::vector<uint64_t> in);
-  void packed_decrypt(seal::Ciphertext& in, std::vector<uint64_t>& out, size_t size);
+  void packed_encrypt(seal::Ciphertext& out, std::vector<int64_t> in);
+  void packed_decrypt(seal::Ciphertext& in, std::vector<int64_t>& out, size_t size);
   // vo = M * vi
   void packed_matMul(seal::Ciphertext& vo, const matrix& M, const seal::Ciphertext& vi);
   // vo = M * vi + b
   void packed_affine(seal::Ciphertext& vo, const matrix& M, const seal::Ciphertext& vi, const vector& b);
   void packed_square(seal::Ciphertext& vo, const seal::Ciphertext& vi);
+
+  void enc_vec_mul(const seal::Ciphertext &encrypted1, const seal::Ciphertext &encrypted2, seal::Ciphertext &destination);
+  void enc_vec_add(const seal::Ciphertext &encrypted1, const seal::Ciphertext &encrypted2, seal::Ciphertext &destination);
 };

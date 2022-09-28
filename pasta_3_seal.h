@@ -19,6 +19,7 @@ class PASTA_SEAL : public SEALZpCipher {
   virtual std::vector<seal::Ciphertext> encrypt_key(std::vector<uint64_t>& secret_key, bool batch_encoder = false);
   virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<uint64_t>& ciphertext, std::vector<seal::Ciphertext>& secret_key_encrypted, bool batch_encoder = false);
   virtual std::vector<uint64_t> decrypt_result(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false);
+  virtual std::vector<int64_t> decrypt_result_int(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false);
   virtual void add_gk_indices();
 
  private:

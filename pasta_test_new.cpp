@@ -20,27 +20,27 @@ struct commData {
     vector<uint64_t> x_p;
 };
 
-Ciphertext encrypting(vector<int64_t> input, SEALContext context, PublicKey public_key) {
-    // encode and encrypt the input
-    BatchEncoder batch_encoder(context);
-    Encryptor encryptor(context, public_key);
-    Plaintext plain_input;
-    batch_encoder.encode(input, plain_input);
-    Ciphertext enc_input;
-    encryptor.encrypt(plain_input, enc_input);
-    return enc_input;
-}
+// Ciphertext encrypting(vector<int64_t> input, SEALContext context, PublicKey public_key) {
+//     // encode and encrypt the input
+//     BatchEncoder batch_encoder(context);
+//     Encryptor encryptor(context, public_key);
+//     Plaintext plain_input;
+//     batch_encoder.encode(input, plain_input);
+//     Ciphertext enc_input;
+//     encryptor.encrypt(plain_input, enc_input);
+//     return enc_input;
+// }
 
-vector<int64_t> decrypting(Ciphertext enc_input, SEALContext context, SecretKey secret_key) {
-    // decrypt and decode the encrypted input
-    BatchEncoder batch_encoder(context);
-    Decryptor decryptor(context, secret_key);
-    Plaintext plain_input;
-    decryptor.decrypt(enc_input, plain_input);
-    vector<int64_t> vec_input;
-    batch_encoder.decode(plain_input, vec_input);
-    return vec_input;
-}
+// vector<int64_t> decrypting(Ciphertext enc_input, SEALContext context, SecretKey secret_key) {
+//     // decrypt and decode the encrypted input
+//     BatchEncoder batch_encoder(context);
+//     Decryptor decryptor(context, secret_key);
+//     Plaintext plain_input;
+//     decryptor.decrypt(enc_input, plain_input);
+//     vector<int64_t> vec_input;
+//     batch_encoder.decode(plain_input, vec_input);
+//     return vec_input;
+// }
 
 int main () {
     commData Test;
@@ -134,6 +134,15 @@ int main () {
     cout << "\nUsing HE to encrypt the user's symmetric key ...\n" << flush;
     vector<seal::Ciphertext>Encrypted_key;
     Encrypted_key = ANALYST_1.encrypt_key(in_key, USE_BATCH);
+    
+    cout << "Checking: decrypting the HE encrypted key" << endl;
+    vector<uint64_t> dec_sym_key;
+    dec_sym_key = ANALYST_1.decrypt_result(Encrypted_key, USE_BATCH);
+    cout << in_key.size() << endl;
+    cout << dec_sym_key.size() << endl;
+    print_vec(in_key, in_key.size(), "symmetric key");
+    print_vec(dec_sym_key, dec_sym_key.size(), "dec_sym_key");
+    // if (dec_sym_key != in_key) throw runtime_error("decrypted symmetric key and the symmetric key are different!");
 
     //Set dummy plaintext and test encryption and decryption
     cout << "\nPlaintext user input: " << endl;
@@ -146,49 +155,51 @@ int main () {
     cout << "\nSymmetrically encrypt the user input ..." << endl;
     Test.c_i = USER_1.encrypt(x_1);
     print_vec(Test.c_i, Test.c_i.size(), "c_i");
-    
+    cout << "Checking: Symmetrically decrypt the user input ..." << endl;
+    auto dec_ci = USER_1.decrypt(Test.c_i);
+    print_vec(dec_ci, dec_ci.size(), "dec_c_i");
+    if (dec_ci != x_1) throw runtime_error("decypted inputs and inputs are different");
+
+    //Analyst's weights and biases
+    cout << "\nAnalyst's weights and biases in plaintext: " << endl;
+    vector<int64_t> w{0, -1, 2, -3};  // dummy weights for now
+    vector<int64_t> b{5, -5, 5, -5};
+    print_vec(w, w.size(), "w");
+    print_vec(b, b.size(), "b");
+    cout << "Analyst encrypts his weights and biases..." << endl;
+    Ciphertext w_c, b_c;
+    ANALYST_1.packed_encrypt(w_c, w);
+    ANALYST_1.packed_encrypt(b_c, b);
+    // Ciphertext w_c = encrypting(w, *context, he_pk);
+    // Ciphertext b_c = encrypting(b, *context, he_pk);
+    cout << "Checking: Analyst decrypts his weights and biases" << endl;
+    vector<int64_t> w_d, b_d;
+    ANALYST_1.packed_decrypt(w_c, w_d, 4);
+    ANALYST_1.packed_decrypt(b_c, b_d, 4);
+    // w_d.push_back(-1);
+    print_vec(w_d, w_d.size(), "w_d");
+    print_vec(b_d, b_d.size(), "b_d");
+    if (w_d != w) throw runtime_error("decypted weigths and weights are different");
+
     //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
     cout << "\nDecomposing C' and C ...\n" << flush;
     Test.c_1 = ANALYST_1.HE_decrypt(Test.c_i, Encrypted_key, USE_BATCH);
     Ciphertext c_prime = Test.c_1[0];
-    vector<uint64_t> decrypted_c_prime = ANALYST_1.decrypt_result(Test.c_1, USE_BATCH);
-    print_vec(decrypted_c_prime, Test.x_i.size(), "decrypted_c_prime");
+    // vector<uint64_t> decrypted_c_prime = ANALYST_1.decrypt_result(Test.c_1, USE_BATCH);
+    // print_vec(decrypted_c_prime, decrypted_c_prime.size(), "decrypted_c_prime");
 
-    //HE Evaluation of the encrypted linear transformation
-    cout << "\nAnalyst's weights and biases in plaintext: " << endl;
-    vector<int64_t> w{17, 31, 24, 17};  // dummy weights for now
-    vector<int64_t> b{-5, -5, -5, -5};
-    print_vec(w, w.size(), "w");
-    print_vec(b, b.size(), "b");
+    cout << "\nEvaluating an encrypted linear transformation: w_c * w_c + b_c .... \n" << flush;
+    Ciphertext c_res;
+    ANALYST_1.enc_vec_mul(w_c, w_c, c_res);
+    // ANALYST_1.enc_vec_mul(w_c, c_prime, c_res);
+    ANALYST_1.enc_vec_add(b_c, c_res, c_res);
+    vector<Ciphertext> c_res_vec{c_res};
 
-    cout << "Encrypting the analyst's weights and biases..." << endl;
-    Ciphertext w_c = encrypting(w, *context, he_pk);
-    Ciphertext b_c = encrypting(b, *context, he_pk);
-    
-
-
-    // cout << "\nEvaluating an encrypted linear transformation: c' * w_c + b_c .... \n" << flush;
-    // SEALContext ctx(parms);
-    // Evaluator seal_evaluator(ctx);
-    // Ciphertext c_res;
-    // seal_evaluator.multiply(w_c, c_prime, c_res);
-    // seal_evaluator.add(b_c, c_res, c_res);
-    // vector<Ciphertext> c_res_vec;
-    // c_res_vec[0] = c_res;
-
-    // cout << "\nAnalyst decrypt the result" << endl;
-    // vector<uint64_t> res = ANALYST_1.decrypt_result(c_res_vec, USE_BATCH);
-    // print_vec(res, Test.x_i.size(), "res");
-
-    // //HE Evaluation with Evaluation Key and store in c_2
-    // cout << "Evaluating an encrypted square .... \n" << flush;
-    // ANALYST_1.square(Test.c_2, Test.c_1);
-    // cout << "Squaring Complete \n";
-
-    // //Decrypt the Decomposed Ciphertext by the Analyst
-    // cout << "\nDecryption of Final Message using SK ...\n" << flush;
-    // Test.x_p = ANALYST_1.decrypt_result(Test.c_2, USE_BATCH);
-    // print_vec(Test.x_p, Test.x_p.size(), "Squared Res");
+    cout << "\nAnalyst decrypt the result" << endl;
+    vector<int64_t> res = ANALYST_1.decrypt_result_int(c_res_vec, USE_BATCH);
+    print_vec(res, res.size(), "res");
+    // auto res2 = decrypting(c_res, *context, he_sk);
+    // print_vec(res2, res2.size(), "res2");
 
     return 0;
 }
