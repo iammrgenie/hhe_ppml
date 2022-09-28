@@ -48,7 +48,7 @@ add_executable(hhe-analyst hhe-analyst.cpp)                             #The Ana
 
 #add_executable(hhe-test)                                               #Checking the PASTA implementation
 #add_executable(pasta-check pasta_check.cpp)                            #Checking the PASTA implementation
-#add_executable(pasta-simple-test pasta_test_new.cpp)                   #Checking the PASTA simplification implementation
+add_executable(pasta-simple-test pasta_test_new.cpp)                   #Checking the PASTA simplification implementation
 
 target_sources(hhe-analyst
         PRIVATE
@@ -83,17 +83,17 @@ target_sources(hhe-client
 #)
 
 
-#target_sources(pasta-simple-test
-#        PRIVATE
-#            pasta_test_new.cpp            
-#            SEAL_Cipher.cpp
-#            pasta_3_seal.cpp
-#            pasta_3_plain.cpp
-#)
+target_sources(pasta-simple-test
+       PRIVATE
+           pasta_test_new.cpp            
+           SEAL_Cipher.cpp
+           pasta_3_seal.cpp
+           pasta_3_plain.cpp
+)
 
 
 target_link_libraries(hhe-analyst SEAL::seal keccak aes)
 target_link_libraries(hhe-client SEAL::seal keccak aes)
 target_link_libraries(hhe-server SEAL::seal keccak aes)
 #target_link_libraries(pasta-check SEAL::seal keccak aes)
-#target_link_libraries(pasta-simple-test SEAL::seal keccak aes)
+target_link_libraries(pasta-simple-test SEAL::seal keccak aes)
