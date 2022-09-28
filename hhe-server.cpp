@@ -152,9 +152,9 @@ int main (int argc, const char * argv[]){
         cout << "[Server] Sending Encryption Parameters to Connected Client\n";
         send(socketClient, parms_string.data(), size+1, 0);
 
-        //Send the Public Key
-        cout << "[Server] Sending Public Key to Connected Client\n";
-        send(socketClient, pk_string.data(), pk_size+1, 0);
+        // //Send the Public Key
+        // cout << "[Server] Sending Public Key to Connected Client\n";
+        // send(socketClient, pk_string.data(), pk_size+1, 0);
 
         close(socketClient);
     }
