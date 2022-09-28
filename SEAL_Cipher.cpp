@@ -426,7 +426,7 @@ void SEALZpCipher::square(std::vector<seal::Ciphertext>& vo,
 //----------------------------------------------------------------
 
 void SEALZpCipher::packed_encrypt(seal::Ciphertext& out,
-                                  std::vector<uint64_t> in) {
+                                  std::vector<int64_t> in) {
   seal::Plaintext p;
   batch_encoder.encode(in, p);
   encryptor.encrypt(p, out);
@@ -435,7 +435,7 @@ void SEALZpCipher::packed_encrypt(seal::Ciphertext& out,
 //----------------------------------------------------------------
 
 void SEALZpCipher::packed_decrypt(seal::Ciphertext& in,
-                                  std::vector<uint64_t>& out, size_t size) {
+                                  std::vector<int64_t>& out, size_t size) {
   seal::Plaintext p;
   decryptor.decrypt(in, p);
   batch_encoder.decode(p, out);
@@ -472,4 +472,16 @@ void SEALZpCipher::packed_square(seal::Ciphertext& vo,
                                  const seal::Ciphertext& vi) {
   evaluator.square(vi, vo);
   evaluator.relinearize_inplace(vo, he_rk);
+}
+
+void SEALZpCipher::enc_vec_mul(const seal::Ciphertext &encrypted1, 
+                               const seal::Ciphertext &encrypted2, 
+                               seal::Ciphertext &destination) {
+  evaluator.multiply(encrypted1, encrypted2, destination);
+}
+
+void SEALZpCipher::enc_vec_add(const seal::Ciphertext &encrypted1, 
+                               const seal::Ciphertext &encrypted2, 
+                               seal::Ciphertext &destination) {
+  evaluator.add(encrypted1, encrypted2, destination);
 }
