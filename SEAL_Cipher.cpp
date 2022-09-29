@@ -3,22 +3,30 @@
 #include <algorithm>
 #include <iostream>
 
-SEALZpCipher::SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk)
-    : params(params),
+SEALZpCipher::SEALZpCipher(ZpCipherParams params,
+                           std::vector<uint64_t> secret_key,
+                           std::shared_ptr<seal::SEALContext> con, 
+                           seal::SecretKey sk,
+                           seal::PublicKey pk)
+    : secret_key(secret_key),
+      params(params),
       context(con),
-      keygen(*context),
-      he_sk(he_sk),
-      he_pk(he_pk),
+      keygen(*context, sk),
+      he_sk(sk),
+      he_pk(pk),
       encryptor(*context, he_sk),
       evaluator(*context),
       decryptor(*context, he_sk),
       batch_encoder(*context) {
-    keygen.create_relin_keys(he_rk);
-    //keygen.create_public_key(he_pk);
-    encryptor.set_public_key(he_pk);
+  if (secret_key.size() != params.key_size)
+    throw std::runtime_error("Invalid Key length");
 
-    mod_degree = context->first_context_data()->parms().poly_modulus_degree();
-    plain_mod = context->first_context_data()->parms().plain_modulus().value();
+  keygen.create_relin_keys(he_rk);
+  //keygen.create_public_key(he_pk);
+  encryptor.set_public_key(he_pk);
+
+  mod_degree = context->first_context_data()->parms().poly_modulus_degree();
+  plain_mod = context->first_context_data()->parms().plain_modulus().value();
 }
 
 std::shared_ptr<seal::SEALContext> SEALZpCipher::create_context(
@@ -49,7 +57,7 @@ std::shared_ptr<seal::SEALContext> SEALZpCipher::create_context(
 }
 
 //----------------------------------------------------------------
-//int SEALZpCipher::print_noise(std::vector<seal::Ciphertext>secret_key_encrypted) { return print_noise(secret_key_encrypted); }
+int SEALZpCipher::print_noise() { return print_noise(secret_key_encrypted); }
 
 //----------------------------------------------------------------
 
@@ -426,7 +434,7 @@ void SEALZpCipher::square(std::vector<seal::Ciphertext>& vo,
 //----------------------------------------------------------------
 
 void SEALZpCipher::packed_encrypt(seal::Ciphertext& out,
-                                  std::vector<int64_t> in) {
+                                  std::vector<uint64_t> in) {
   seal::Plaintext p;
   batch_encoder.encode(in, p);
   encryptor.encrypt(p, out);
@@ -435,7 +443,7 @@ void SEALZpCipher::packed_encrypt(seal::Ciphertext& out,
 //----------------------------------------------------------------
 
 void SEALZpCipher::packed_decrypt(seal::Ciphertext& in,
-                                  std::vector<int64_t>& out, size_t size) {
+                                  std::vector<uint64_t>& out, size_t size) {
   seal::Plaintext p;
   decryptor.decrypt(in, p);
   batch_encoder.decode(p, out);
@@ -472,16 +480,4 @@ void SEALZpCipher::packed_square(seal::Ciphertext& vo,
                                  const seal::Ciphertext& vi) {
   evaluator.square(vi, vo);
   evaluator.relinearize_inplace(vo, he_rk);
-}
-
-void SEALZpCipher::enc_vec_mul(const seal::Ciphertext &encrypted1, 
-                               const seal::Ciphertext &encrypted2, 
-                               seal::Ciphertext &destination) {
-  evaluator.multiply(encrypted1, encrypted2, destination);
-}
-
-void SEALZpCipher::enc_vec_add(const seal::Ciphertext &encrypted1, 
-                               const seal::Ciphertext &encrypted2, 
-                               seal::Ciphertext &destination) {
-  evaluator.add(encrypted1, encrypted2, destination);
 }
