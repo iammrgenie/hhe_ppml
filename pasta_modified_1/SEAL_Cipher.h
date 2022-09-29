@@ -52,7 +52,7 @@ class SEALZpCipher {
   // Size of a plaintext block in words
   size_t get_cipher_size() const { return params.cipher_size; }
   
-  std::vector<seal::Ciphertext> get_sk() const { return secret_key_encrypted; } // DK changes
+  std::vector<seal::Ciphertext> get_enc_sk() const { return secret_key_encrypted; } // DK changes
   seal::PublicKey get_he_pk() const { return he_pk; } // DK changes
   seal::SecretKey get_he_sk() const { return he_sk; } // DK changes
 

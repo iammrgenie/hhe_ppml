@@ -126,14 +126,14 @@ int main() {
     auto context = make_shared<seal::SEALContext>(parms, true, sec);
 
     PASTA_3_MODIFIED_1::PASTA_SEAL M1(in_key, context);
-    //Initiate the Class for Encryption and Decryption using PASTA Symmetric Key for Encryption and Decryption
+    //Initiate the Class for Encryforwardption and Decryption using PASTA Symmetric Key for Encryption and Decryption
     PASTA_3_MODIFIED_1::PASTA EN(in_key, plain_mod);
 
     //Print the necessary parameters to screen
     M1.print_parameters();
 
     //compute the HE encryption of the secret key and measure performance
-    M1.activate_bsgs(false);
+    // M1.activate_bsgs(false);
     M1.add_gk_indices();
     M1.create_gk();
 
@@ -143,14 +143,20 @@ int main() {
     cout << endl;
     cout << "Checking: decrypting the HE encrypted key" << endl;
     vector<uint64_t> dec_sym_key;
-    auto M1_sk = M1.get_sk();
+    auto M1_sk = M1.get_enc_sk();
     cout << "M1_sk size = " << M1_sk.size() << endl;
     dec_sym_key = M1.decrypt_result(M1_sk, USE_BATCH);
     cout << "symmetric key size = " << in_key.size() << "; decrypted key size = " << dec_sym_key.size() << endl;
-    // print_vec(in_key, in_key.size(), "symmetric key");
-    // print_vec(dec_sym_key, dec_sym_key.size(), "dec_sym_key");
 
-    //Set dummy plaintext and test encryption and decryption
+    auto enc_key2 = M1.encrypt_key_2(in_key, USE_BATCH);
+    vector<uint64_t> dec_sym_key2;
+    dec_sym_key2 = M1.decrypt_result(enc_key2, USE_BATCH);
+    // print_vec(in_key, in_key.size(), "symmetric key");
+    print_vec(dec_sym_key, dec_sym_key.size(), "dec_sym_key");
+    print_vec(dec_sym_key2, dec_sym_key2.size(), "dec_sym_key");
+    if (dec_sym_key != dec_sym_key2) throw runtime_error("decypted keys are different");
+
+    // Set dummy plaintext and test encryption and decryption
     cout << "\nPlaintext user input: " << endl;
     print_vec(Test.x_i, Test.x_i.size(), "x_i");
      
@@ -179,7 +185,8 @@ int main() {
 
     //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
     cout << "\nDecomposing: turn symmetric encrypted data into he encrypted data ...\n" << flush;
-    Test.c_1 = M1.HE_decrypt(Test.c_i, USE_BATCH);
+    // Test.c_1 = M1.HE_decrypt(Test.c_i, USE_BATCH);
+    Test.c_1 = M1.HE_decrypt_2(Test.c_i, enc_key2, USE_BATCH);
     Ciphertext c_prime = Test.c_1[0];
 
     //HE Evaluation of the encrypted linear transformation

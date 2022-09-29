@@ -20,8 +20,12 @@ class PASTA_SEAL : public SEALZpCipher {
     return "PASTA-SEAL (n=128,r=3)";
   }
   virtual void encrypt_key(bool batch_encoder = false);
+  virtual std::vector<seal::Ciphertext> encrypt_key_2(std::vector<uint64_t> ssk, bool batch_encoder = false);  // DK changes
   virtual std::vector<seal::Ciphertext> HE_decrypt(
       std::vector<uint64_t>& ciphertext, bool batch_encoder = false);
+  virtual std::vector<seal::Ciphertext> HE_decrypt_2(std::vector<uint64_t>& ciphertext, 
+                                                     std::vector<seal::Ciphertext> enc_ssk, 
+                                                     bool batch_encoder = false);  // DK changes
   virtual std::vector<uint64_t> decrypt_result(
       std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false);
   virtual void add_gk_indices();
