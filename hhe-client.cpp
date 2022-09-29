@@ -100,9 +100,13 @@ int main (int argc, const char * argv[]){
 
     cout << "[Client] Receiving Encryption Parameters\n";
     string parms_string;
-    int n;
-    while ((n = recv(clientSocket, parms_char, sizeof(parms_char), 0)) > 0 )
-        parms_string.append(parms_char, parms_char + n);
+    recv(clientSocket, parms_char, sizeof(parms_char), 0);
+    for (int i = 0; i < sizeof(parms_char); i++){
+        parms.string.push_back(parms_char[i])
+    }
+    // int n;
+    // while ((n = recv(clientSocket, parms_char, sizeof(parms_char), 0)) > 0 )
+    //     parms_string.append(parms_char, parms_char + n);
 
     //Deserialize from Parms String to SEAL object
     parms_stream << parms_string;
@@ -114,33 +118,34 @@ int main (int argc, const char * argv[]){
     
     cout << "[Client] Receiving Public Key from Server\n";
     string pk_string;
-    int i;
-    while ((i = recv(clientSocket, pk_char, sizeof(pk_char), 0)) > 0 )
-        pk_string.append(pk_char, pk_char + n);
+    
+    // int i;
+    // while ((i = recv(clientSocket, pk_char, sizeof(pk_char), 0)) > 0 )
+    //     pk_string.append(pk_char, pk_char + n);
     
     //Deserialize from PK String to SEAL object
-    pk_stream << pk_string;
+    //pk_stream << pk_string;
 
-    //Load Public Key
-    PublicKey he_pk;
-    he_pk.load(context, pk_stream);
+    // //Load Public Key
+    // PublicKey he_pk;
+    // he_pk.load(context, pk_stream);
 
-    //Instantiate the PASTA object for symmetric encryption and decryption
-    PASTA_3::PASTA USER_1(in_key, plain_mod);
+    // //Instantiate the PASTA object for symmetric encryption and decryption
+    // PASTA_3::PASTA USER_1(in_key, plain_mod);
 
-    //Set dummy plaintext and test encryption and decryption
-    cout << "\nPlaintext user input: " << endl;
-    // vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
-    // vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
-    vector<uint64_t> x_1 = {0x10};
-    print_vec(x_1, x_1.size(), "x_1");
+    // //Set dummy plaintext and test encryption and decryption
+    // cout << "\nPlaintext user input: " << endl;
+    // // vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
+    // // vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
+    // vector<uint64_t> x_1 = {0x10};
+    // print_vec(x_1, x_1.size(), "x_1");
 
-    //Encrypt plaintext with the set key
-    cout << "\nSymmetrically encrypt the user input ..." << endl;
-    user1.c_i = USER_1.encrypt(x_1);
-    print_vec(user1.c_i, user1.c_i.size(), "c_i");
+    // //Encrypt plaintext with the set key
+    // cout << "\nSymmetrically encrypt the user input ..." << endl;
+    // user1.c_i = USER_1.encrypt(x_1);
+    // print_vec(user1.c_i, user1.c_i.size(), "c_i");
 
-    //Encrypt Symmetric Key with HE pk
+    // //Encrypt Symmetric Key with HE pk
    
     close(clientSocket);
     return 0;
