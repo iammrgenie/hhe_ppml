@@ -4,12 +4,10 @@
 #include <iostream>
 
 SEALZpCipher::SEALZpCipher(ZpCipherParams params,
-                           std::vector<uint64_t> secret_key,
                            std::shared_ptr<seal::SEALContext> con, 
                            seal::SecretKey sk,
                            seal::PublicKey pk)
-    : secret_key(secret_key),
-      params(params),
+    : params(params),
       context(con),
       keygen(*context, sk),
       he_sk(sk),
@@ -18,8 +16,8 @@ SEALZpCipher::SEALZpCipher(ZpCipherParams params,
       evaluator(*context),
       decryptor(*context, he_sk),
       batch_encoder(*context) {
-  if (secret_key.size() != params.key_size)
-    throw std::runtime_error("Invalid Key length");
+  // if (secret_key.size() != params.key_size)
+  //   throw std::runtime_error("Invalid Key length");
 
   keygen.create_relin_keys(he_rk);
   //keygen.create_public_key(he_pk);

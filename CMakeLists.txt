@@ -42,12 +42,12 @@ add_subdirectory(util)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 
-add_executable(hhe-test main.cpp)                               #The Server in our implementation
+add_executable(hhe-test tests/initial_test.cpp)                               #The Server in our implementation
 
 
 target_sources(hhe-test
         PRIVATE
-            main.cpp            
+            tests/initial_test.cpp           
             SEAL_Cipher.cpp
             pasta_3_seal.cpp
             pasta_3_plain.cpp

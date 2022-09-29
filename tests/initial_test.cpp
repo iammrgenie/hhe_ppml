@@ -2,12 +2,12 @@
 #include <iostream>
 #include <string>
 
-#include "SEAL_Cipher.h"
-#include "utils.h"
+#include "../SEAL_Cipher.h"
+#include "../utils.h"
 
-#include "pasta_3_seal.h"
-#include "pasta_3_plain.h"
-#include "sealhelper.h"
+#include "../pasta_3_seal.h"
+#include "../pasta_3_plain.h"
+#include "../sealhelper.h"
 
 static const bool USE_BATCH = true;
 
@@ -96,9 +96,11 @@ int main () {
     seal::SecretKey he_sk(keygen.secret_key());         //HE Decryption Key
     seal::PublicKey he_pk;                            //HE Encryption Key
     keygen.create_public_key(he_pk);
+
+    std::vector<seal::Ciphertext> secret_key_encrypted;
         
     //Initiate the Class for HHE using PASTA_SEAL and set all parameters for HE
-    PASTA_3::PASTA_SEAL ANAL(in_key, context, he_sk, he_pk);
+    PASTA_3::PASTA_SEAL ANAL(context, he_sk, he_pk);
     
     //Initiate the Class for Encryption and Decryption using PASTA Symmetric Key for Encryption and Decryption
     PASTA_3::PASTA USER(in_key, plain_mod);
@@ -113,11 +115,11 @@ int main () {
 
     //Encrypt the secret key with HE
     cout << "\nUsing HE to encrypt the generated key ...\n" << flush;
-    ANAL.encrypt_key(USE_BATCH);
+    secret_key_encrypted = ANAL.encrypt_key(in_key, USE_BATCH);
 
     //Set dummy plaintext and test encryption and decryption
     //vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
-    vector<uint64_t> x_1 = {0x20};
+    vector<uint64_t> x_1 = {0x50};
     print_vec(x_1, x_1.size(), "Input ");
 
     //Encrypt plaintext with the symmetric key
@@ -125,7 +127,7 @@ int main () {
 
     //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
     cout << "\nDecomposing C' and C ...\n" << flush;
-    User1.c_1 = ANAL.HE_decrypt(User1.c_i, USE_BATCH);
+    User1.c_1 = ANAL.HE_decrypt(secret_key_encrypted, User1.c_i, USE_BATCH);
 
     //HE Evaluation with Evaluation Key
     cout << "Evaluating using Square operation .... \n" << flush;
