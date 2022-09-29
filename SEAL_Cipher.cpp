@@ -12,7 +12,7 @@ SEALZpCipher::SEALZpCipher(ZpCipherParams params,
       keygen(*context, sk),
       he_sk(sk),
       he_pk(pk),
-      encryptor(*context, he_sk),
+      encryptor(*context, he_pk),
       evaluator(*context),
       decryptor(*context, he_sk),
       batch_encoder(*context) {
@@ -21,7 +21,7 @@ SEALZpCipher::SEALZpCipher(ZpCipherParams params,
 
   keygen.create_relin_keys(he_rk);
   //keygen.create_public_key(he_pk);
-  encryptor.set_public_key(he_pk);
+  //encryptor.set_public_key(he_pk);
 
   mod_degree = context->first_context_data()->parms().poly_modulus_degree();
   plain_mod = context->first_context_data()->parms().plain_modulus().value();
