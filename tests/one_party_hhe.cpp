@@ -3,39 +3,39 @@
 #include <string>
 #include <typeinfo>
 
-#include "SEAL_Cipher.h"
+#include "../pasta_modified_1/SEAL_Cipher.h"
 //#include "HHE/ciphers/common/utils.h"
-#include "pasta_3_plain.h"  // for PASTA_params
+#include "../pasta_modified_1/pasta_3_plain.h"  // for PASTA_params
 
-#include "pasta_3_seal.h"
-#include "sealhelper.h"
+#include "../pasta_modified_1/pasta_3_seal.h"
+#include "../sealhelper.h"
 
 static const bool USE_BATCH = true;
 
 using namespace std;
 using namespace seal;
 
-Ciphertext encrypting(vector<int64_t> input, SEALContext context, PublicKey public_key) {
-    // encode and encrypt the input
-    BatchEncoder batch_encoder(context);
-    Encryptor encryptor(context, public_key);
-    Plaintext plain_input;
-    batch_encoder.encode(input, plain_input);
-    Ciphertext enc_input;
-    encryptor.encrypt(plain_input, enc_input);
-    return enc_input;
-}
+// Ciphertext encrypting(vector<int64_t> input, SEALContext context, PublicKey public_key) {
+//     // encode and encrypt the input
+//     BatchEncoder batch_encoder(context);
+//     Encryptor encryptor(context, public_key);
+//     Plaintext plain_input;
+//     batch_encoder.encode(input, plain_input);
+//     Ciphertext enc_input;
+//     encryptor.encrypt(plain_input, enc_input);
+//     return enc_input;
+// }
 
-vector<int64_t> decrypting(Ciphertext enc_input, SEALContext context, SecretKey secret_key) {
-    // decrypt and decode the encrypted input
-    BatchEncoder batch_encoder(context);
-    Decryptor decryptor(context, secret_key);
-    Plaintext plain_input;
-    decryptor.decrypt(enc_input, plain_input);
-    vector<int64_t> vec_input;
-    batch_encoder.decode(plain_input, vec_input);
-    return vec_input;
-}
+// vector<int64_t> decrypting(Ciphertext enc_input, SEALContext context, SecretKey secret_key) {
+//     // decrypt and decode the encrypted input
+//     BatchEncoder batch_encoder(context);
+//     Decryptor decryptor(context, secret_key);
+//     Plaintext plain_input;
+//     decryptor.decrypt(enc_input, plain_input);
+//     vector<int64_t> vec_input;
+//     batch_encoder.decode(plain_input, vec_input);
+//     return vec_input;
+// }
 
 struct UserData {
     vector<uint64_t> x_i{0, 1, 2, 3};
@@ -48,11 +48,13 @@ struct UserData {
 struct AnalystData {  
     vector<int64_t> w{17, 31, 24, 17};  // dummy weights for now
     vector<int64_t> b{-5, -5, -5, -5};  // dummy biases for now
-    Ciphertext w_c;
+    Ciphertext w_c; // Ciphertext or 
     Ciphertext b_c;
 };
 
 int main() {
+    print_example_banner("Testing the HHE protocol with 1 party using the PASTA library");
+
     //int cnt = 2;
     UserData Test;
     AnalystData Analyst;
@@ -90,7 +92,7 @@ int main() {
                                       0x09f7d, 0x0596c, 0x0d164, 0x0dc49, 0x038ff, 0x0a495, 0x07d5a, 0x02d4,
                                       0x06c6c, 0x0ea76, 0x09af5, 0x0bea6, 0x08eea, 0x0fbb6, 0x09e45, 0x0e9db,
                                       0x0d106, 0x0e7fd, 0x04ddf, 0x08bb8, 0x0a3a4, 0x03bcd, 0x036d9, 0x05acf
-                                  };
+    };
 
     //Set the Homorphic Parameters
   	uint64_t plain_mod = 65537;
@@ -120,12 +122,12 @@ int main() {
     parms.set_coeff_modulus(seal::CoeffModulus::BFVDefault(mod_degree));
     }
     parms.set_plain_modulus(plain_mod);
-    SEALContext seal_context(parms);
+    // SEALContext seal_context(parms);
     auto context = make_shared<seal::SEALContext>(parms, true, sec);
 
-    PASTA_3::PASTA_SEAL M1(in_key, context);
+    PASTA_3_MODIFIED_1::PASTA_SEAL M1(in_key, context);
     //Initiate the Class for Encryption and Decryption using PASTA Symmetric Key for Encryption and Decryption
-    PASTA_3::PASTA EN(in_key, plain_mod);
+    PASTA_3_MODIFIED_1::PASTA EN(in_key, plain_mod);
 
     //Print the necessary parameters to screen
     M1.print_parameters();
@@ -139,12 +141,17 @@ int main() {
     cout << "\nUsing HE to encrypt the user's symmetric key ..." << flush;
     M1.encrypt_key(USE_BATCH);
     cout << endl;
+    cout << "Checking: decrypting the HE encrypted key" << endl;
+    vector<uint64_t> dec_sym_key;
+    auto M1_sk = M1.get_sk();
+    cout << "M1_sk size = " << M1_sk.size() << endl;
+    dec_sym_key = M1.decrypt_result(M1_sk, USE_BATCH);
+    cout << "symmetric key size = " << in_key.size() << "; decrypted key size = " << dec_sym_key.size() << endl;
+    // print_vec(in_key, in_key.size(), "symmetric key");
+    // print_vec(dec_sym_key, dec_sym_key.size(), "dec_sym_key");
 
     //Set dummy plaintext and test encryption and decryption
     cout << "\nPlaintext user input: " << endl;
-    // vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
-    // vector<uint64_t> x_2 = {0x0b3dd, 0x07975, 0x0928b, 0x01024, 0x0632e, 0x07702, 0x05ca1, 0x08e2d};
-    // vector<uint64_t> x_1 = {0x10};
     print_vec(Test.x_i, Test.x_i.size(), "x_i");
      
     //Encrypt plaintext with the symmetric secret key
@@ -157,8 +164,18 @@ int main() {
     print_vec(Analyst.w, Analyst.w.size(), "w");
     print_vec(Analyst.b, Analyst.b.size(), "b");
     cout << "Encrypting the analyst's weights and biases..." << endl;
-    Analyst.w_c = encrypting(Analyst.w, seal_context, M1.get_he_pk());
-    Analyst.b_c = encrypting(Analyst.b, seal_context, M1.get_he_pk());
+    // Analyst.w_c = encrypting(Analyst.w, seal_context, M1.get_he_pk());
+    // Analyst.b_c = encrypting(Analyst.b, seal_context, M1.get_he_pk());
+    M1.packed_encrypt(Analyst.w_c, Analyst.w);
+    M1.packed_encrypt(Analyst.b_c, Analyst.b);
+    cout << "Checking: Analyst decrypts his weights and biases" << endl;
+    vector<int64_t> w_d, b_d;
+    // w_d = decrypting(Analyst.w_c, *context, M1.get_he_sk());
+    // b_d = decrypting(Analyst.b_c, *context, M1.get_he_sk());
+    M1.packed_decrypt(Analyst.w_c, w_d, Analyst.w.size());
+    M1.packed_decrypt(Analyst.b_c, b_d, Analyst.b.size());
+    print_vec(w_d, w_d.size(), "w_d");
+    print_vec(b_d, b_d.size(), "b_d");
 
     //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
     cout << "\nDecomposing: turn symmetric encrypted data into he encrypted data ...\n" << flush;
@@ -167,14 +184,16 @@ int main() {
 
     //HE Evaluation of the encrypted linear transformation
     cout << "\nEvaluating an encrypted linear transformation: c' * w_c + b_c .... \n" << flush;
-    Evaluator seal_evaluator(seal_context);
+    // Evaluator seal_evaluator(seal_context);
     Ciphertext c_res;
-    seal_evaluator.multiply(Analyst.w_c, c_prime, c_res);
-    seal_evaluator.add(Analyst.b_c, c_res, c_res);
+    M1.packed_enc_mul(Analyst.w_c, c_prime, c_res);
+    M1.packed_enc_add(Analyst.b_c, c_res, c_res);
 
     cout << "\nAnalyst decrypt the result" << endl;
-    vector<int64_t> res = decrypting(c_res, seal_context, M1.get_he_sk());
-    print_vec(res, Test.x_i.size(), "res");
+    // vector<int64_t> res = decrypting(c_res, seal_context, M1.get_he_sk());
+    vector<int64_t> res;
+    M1.packed_decrypt(c_res, res, Analyst.w.size());
+    print_vec(res, res.size(), "res");
     
     return 0;
 }
