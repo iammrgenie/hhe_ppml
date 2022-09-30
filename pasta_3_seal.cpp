@@ -4,28 +4,26 @@ using namespace seal;
 
 namespace PASTA_3 {
 
-std::vector<seal::Ciphertext> PASTA_SEAL::encrypt_key(std::vector<uint64_t>& secret_key, bool batch_encoder) {
-  std::vector<seal::Ciphertext> secret_key_encrypted;
-
+std::vector<seal::Ciphertext> PASTA_SEAL::encrypt_key(std::vector<uint64_t> skey, bool batch_encoder) {
   (void)batch_encoder;  // patched implementation: ignore param
-  secret_key_encrypted.resize(1);
+  std::vector<Ciphertext> enc_sk;
+  enc_sk.resize(1);
   Plaintext k;
   std::vector<uint64_t> key_tmp(halfslots + PASTA_T, 0);
-
   for (size_t i = 0; i < PASTA_T; i++) {
-    key_tmp[i] = secret_key[i];
-    key_tmp[i + halfslots] = secret_key[i + PASTA_T];
+    key_tmp[i] = skey[i];
+    key_tmp[i + halfslots] = skey[i + PASTA_T];
   }
   this->batch_encoder.encode(key_tmp, k);
-  
-  encryptor.encrypt(k, secret_key_encrypted[0]);
+  encryptor.encrypt(k, enc_sk[0]);
 
-  return secret_key_encrypted;
+  return enc_sk;
 }
 
 //----------------------------------------------------------------
 
-std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<uint64_t>& ciphertexts, std::vector<seal::Ciphertext>& secret_key_encrypted, bool batch_encoder) {
+std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<seal::Ciphertext> enc_key,
+    std::vector<uint64_t>& ciphertexts, bool batch_encoder) {
   (void)batch_encoder;  // patched implementation: ignore param
 
   uint64_t nonce = 123456789;
@@ -38,7 +36,7 @@ std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<uint64_t>& ciphertext
 
   for (uint64_t b = 0; b < num_block; b++) {
     pasta.init_shake(nonce, b);
-    Ciphertext state = secret_key_encrypted[0];
+    Ciphertext state = enc_key[0];
 
     for (uint8_t r = 1; r <= PASTA_R; r++) {
       std::cout << "round " << (int)r << std::endl;
@@ -52,7 +50,7 @@ std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(std::vector<uint64_t>& ciphertext
         sbox_cube(state);
       else
         sbox_feistel(state);
-      //print_noise(state);
+      print_noise(state);
     }
 
     std::cout << "final add" << std::endl;
@@ -96,21 +94,6 @@ std::vector<uint64_t> PASTA_SEAL::decrypt_result(
   res.resize(params.plain_size);
   return res;
 }
-
-//----------------------------------------------------------------
-
-std::vector<int64_t> PASTA_SEAL::decrypt_result_int(
-    std::vector<Ciphertext>& ciphertext, bool batch_encoder) {
-  (void)batch_encoder;  // patched implementation: ignore param
-  Plaintext p;
-  std::vector<int64_t> res;
-  decryptor.decrypt(ciphertext[0], p);
-  this->batch_encoder.decode(p, res);
-  res.resize(params.plain_size);
-  return res;
-}
-
-
 
 //----------------------------------------------------------------
 

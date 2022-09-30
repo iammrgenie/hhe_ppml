@@ -24,6 +24,7 @@ static const bool USE_BATCH = true;
 stringstream parms_stream;
 stringstream data_stream;
 stringstream pk_stream;
+stringstream sk_stream;
 
 struct commData {
     vector<uint64_t> x_i;
@@ -66,6 +67,7 @@ int main (int argc, const char * argv[]){
     }
     parms.set_plain_modulus(plain_mod);
     auto context = make_shared<seal::SEALContext>(parms, true, sec);
+    SEALContext con1(parms);
 
     //Convert Encryption parameters to a string for communication
     auto size = parms.save(parms_stream);
@@ -89,8 +91,13 @@ int main (int argc, const char * argv[]){
     //Save and send HE public key
     auto pk_size = he_pk.save(pk_stream);
     string pk_string = pk_stream.str();
+
+    //Save and send HE secret key
+    auto sk_size = he_sk.save(sk_stream);
+    string sk_string = sk_stream.str();
     
-    cout << "Public Key: wrote " << pk_size << " bytes" << endl;
+    cout << "[Server] Public Key: wrote " << pk_size << " bytes" << endl;
+    cout << "[Server] Secret Key: wrote " << sk_size << " bytes" << endl;
 
     
     //Socket Communication Section
@@ -150,11 +157,23 @@ int main (int argc, const char * argv[]){
 
         //Send the Encryption Parameters
         cout << "[Server] Sending Encryption Parameters to Connected Client\n";
-        send(socketClient, parms_string.data(), size+1, 0);
+        send(socketClient, parms_string.data(), size + 1, 0);
 
-        // //Send the Public Key
-        // cout << "[Server] Sending Public Key to Connected Client\n";
-        // send(socketClient, pk_string.data(), pk_size+1, 0);
+        char key_length[10];
+        sprintf(key_length, "%ld", sk_size);
+        cout << "[Server] Size of Key = " << key_length << endl;
+
+        send(socketClient, key_length, sizeof(key_length) + 1, 0);
+        
+        //Send the Key
+        cout << "[Server] Sending Key to Connected Client\n";
+        send(socketClient, sk_string.data(), sk_size, 0);
+
+        // data_stream << pk_string;
+
+        // PublicKey pknew;
+        // pknew.load(con1, data_stream);
+
 
         close(socketClient);
     }

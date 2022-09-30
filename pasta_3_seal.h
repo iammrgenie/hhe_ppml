@@ -8,18 +8,20 @@ namespace PASTA_3 {
 class PASTA_SEAL : public SEALZpCipher {
  public:
   typedef PASTA Plain;
-  PASTA_SEAL(std::shared_ptr<seal::SEALContext> con, seal::SecretKey he_sk, seal::PublicKey he_pk)
-      : SEALZpCipher(PASTA_PARAMS, con, he_sk, he_pk), slots(this->batch_encoder.slot_count()), halfslots(slots >> 1) {}
+  PASTA_SEAL(std::shared_ptr<seal::SEALContext> con, seal::SecretKey sk, seal::PublicKey pk) 
+      : SEALZpCipher(PASTA_PARAMS, con, sk, pk),
+        slots(this->batch_encoder.slot_count()),
+        halfslots(slots >> 1) {}
 
   virtual ~PASTA_SEAL() = default;
 
   virtual std::string get_cipher_name() const {
     return "PASTA-SEAL (n=128,r=3)";
   }
-  virtual std::vector<seal::Ciphertext> encrypt_key(std::vector<uint64_t>& secret_key, bool batch_encoder = false);
-  virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<uint64_t>& ciphertext, std::vector<seal::Ciphertext>& secret_key_encrypted, bool batch_encoder = false);
-  virtual std::vector<uint64_t> decrypt_result(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false);
-  virtual std::vector<int64_t> decrypt_result_int(std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false);
+  virtual std::vector<seal::Ciphertext> encrypt_key(std::vector<uint64_t> skey, bool batch_encoder = false);
+  virtual std::vector<seal::Ciphertext> HE_decrypt(std::vector<seal::Ciphertext> enc_key, std::vector<uint64_t>& ciphertext, bool batch_encoder = false);
+  virtual std::vector<uint64_t> decrypt_result(
+      std::vector<seal::Ciphertext>& ciphertext, bool batch_encoder = false);
   virtual void add_gk_indices();
 
  private:
@@ -31,12 +33,18 @@ class PASTA_SEAL : public SEALZpCipher {
 
   void sbox_feistel(seal::Ciphertext& state);
   void sbox_cube(seal::Ciphertext& state);
-  void matmul(seal::Ciphertext& state,const std::vector<std::vector<uint64_t>>& mat1,const std::vector<std::vector<uint64_t>>& mat2);
+  void matmul(seal::Ciphertext& state,
+              const std::vector<std::vector<uint64_t>>& mat1,
+              const std::vector<std::vector<uint64_t>>& mat2);
   void add_rc(seal::Ciphertext& state, const std::vector<uint64_t>& rc);
   void mix(seal::Ciphertext& state);
 
-  void diagonal(seal::Ciphertext& state, const std::vector<std::vector<uint64_t>>& mat1, const std::vector<std::vector<uint64_t>>& mat2);
-  void babystep_giantstep(seal::Ciphertext& state, const std::vector<std::vector<uint64_t>>& mat1, const std::vector<std::vector<uint64_t>>& mat2);
+  void diagonal(seal::Ciphertext& state,
+                const std::vector<std::vector<uint64_t>>& mat1,
+                const std::vector<std::vector<uint64_t>>& mat2);
+  void babystep_giantstep(seal::Ciphertext& state,
+                          const std::vector<std::vector<uint64_t>>& mat1,
+                          const std::vector<std::vector<uint64_t>>& mat2);
 };
 
 }  // namespace PASTA_3

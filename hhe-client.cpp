@@ -19,6 +19,7 @@ using namespace seal;
 stringstream parms_stream;
 stringstream data_stream;
 stringstream pk_stream;
+stringstream sk_stream;
 
 static const bool USE_BATCH = true;
 
@@ -76,7 +77,6 @@ int main (int argc, const char * argv[]){
 
     //char client_message[4096], server_reply[4096];
     char parms_char[102];
-    char pk_char[2057156];
 
     //create socket
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -102,33 +102,52 @@ int main (int argc, const char * argv[]){
     string parms_string;
     recv(clientSocket, parms_char, sizeof(parms_char), 0);
     for (int i = 0; i < sizeof(parms_char); i++){
-        parms.string.push_back(parms_char[i])
+        parms_string.push_back(parms_char[i]);
     }
-    // int n;
-    // while ((n = recv(clientSocket, parms_char, sizeof(parms_char), 0)) > 0 )
-    //     parms_string.append(parms_char, parms_char + n);
 
     //Deserialize from Parms String to SEAL object
     parms_stream << parms_string;
 
     EncryptionParameters parms;
     parms.load(parms_stream);
+    print_parameters(parms);
     
     SEALContext context(parms);
     
-    cout << "[Client] Receiving Public Key from Server\n";
-    string pk_string;
-    
-    // int i;
-    // while ((i = recv(clientSocket, pk_char, sizeof(pk_char), 0)) > 0 )
-    //     pk_string.append(pk_char, pk_char + n);
-    
-    //Deserialize from PK String to SEAL object
-    //pk_stream << pk_string;
+    // cout << "[Client] Receiving Public Key from Server\n";
+    // string pk_string;
 
-    // //Load Public Key
-    // PublicKey he_pk;
-    // he_pk.load(context, pk_stream);
+    // recv(clientSocket, pk_char, sizeof(pk_char), 0);
+    // for (int j = 0; j < sizeof(pk_char); j ++){
+    //     pk_string.push_back(pk_char[j]);
+    // }
+
+    //Receive size of incoming Key
+    char key_length[10];
+    recv(clientSocket, key_length, sizeof(key_length) + 1, 0);
+
+    long int sk_size;
+    sscanf(key_length + 1, "%ld", &sk_size);
+    cout << "Key size = " << sk_size << endl;
+
+    //Receive incoming Key
+    char sk_char[sk_size];
+    cout << "[Client] Receiving Secret Key from Server\n";
+    string sk_string;
+
+    recv(clientSocket, sk_char, sizeof(sk_char), 0);
+    for (int j = 0; j < sizeof(sk_char); j ++){
+         sk_string.push_back(sk_char[j]);
+    }
+
+    // cout << "Received String " << sk_string << "\n\n";
+    
+    // //Deserialize from String to SEAL object
+    // sk_stream << sk_string;
+
+    // //Load Key
+    // SecretKey he_sk;
+    // he_sk.load(context, sk_stream);
 
     // //Instantiate the PASTA object for symmetric encryption and decryption
     // PASTA_3::PASTA USER_1(in_key, plain_mod);
