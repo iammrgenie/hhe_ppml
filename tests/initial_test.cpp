@@ -12,6 +12,7 @@
 static const bool USE_BATCH = true;
 
 using namespace std;
+using namespace seal;
 
 struct commData {
   vector<uint64_t> x_i;
@@ -20,6 +21,29 @@ struct commData {
   vector<seal::Ciphertext> c_2;
   vector<uint64_t> x_p;
 };
+
+std::vector<Ciphertext> encrypt_symmetric_key(std::vector<uint64_t> ssk, 
+                                              bool batch_encoder,
+                                              const BatchEncoder &benc,
+                                              const Encryptor &enc) {
+  size_t PASTA_T_COPPIED = 128;     // get this constant from the file 'pasta_3_plain.h
+  (void) batch_encoder;             // patched implementation: ignore param
+  std::vector<Ciphertext> enc_sk;
+  enc_sk.resize(1);
+  Plaintext k;
+  size_t slots = benc.slot_count();
+  size_t halfslots = slots >> 1;
+  std::vector<uint64_t> key_tmp(halfslots + PASTA_T_COPPIED, 0);
+  for (size_t i = 0; i < PASTA_T_COPPIED; i++) {
+    key_tmp[i] = ssk[i];
+    key_tmp[i + halfslots] = ssk[i + PASTA_T_COPPIED];
+  }
+  benc.encode(key_tmp, k);
+  enc.encrypt(k, enc_sk[0]);
+  return enc_sk;
+}
+
+
 int main () {
     commData User1;
 
@@ -97,7 +121,11 @@ int main () {
     seal::PublicKey he_pk;                            //HE Encryption Key
     keygen.create_public_key(he_pk);
 
-    std::vector<seal::Ciphertext> secret_key_encrypted;
+    vector<Ciphertext> secret_key_encrypted;
+    vector<Ciphertext> secret_key_encrypted_1;
+
+    Encryptor Enc(*context, he_pk);
+    BatchEncoder Benc(*context);
         
     //Initiate the Class for HHE using PASTA_SEAL and set all parameters for HE
     PASTA_3::PASTA_SEAL ANAL(context, he_sk, he_pk);
@@ -117,6 +145,10 @@ int main () {
     cout << "\nUsing HE to encrypt the generated key ...\n" << flush;
     secret_key_encrypted = ANAL.encrypt_key(in_key, USE_BATCH);
 
+     //Encrypt the secret key with HE -- test
+    cout << "\nUsing HE to encrypt the secret key -- test ...\n" << flush;
+    secret_key_encrypted_1 = encrypt_symmetric_key(in_key, USE_BATCH, Benc, Enc);
+
     //Set dummy plaintext and test encryption and decryption
     //vector<uint64_t> x_1 = {0x01c4f, 0x0e3e4, 0x08fe2, 0x0d7db, 0x05594, 0x05c72, 0x0962a, 0x02c3c};
     vector<uint64_t> x_1 = {0x50};
@@ -127,7 +159,8 @@ int main () {
 
     //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
     cout << "\nDecomposing C' and C ...\n" << flush;
-    User1.c_1 = ANAL.HE_decrypt(secret_key_encrypted, User1.c_i, USE_BATCH);
+    User1.c_1 = ANAL.HE_decrypt(secret_key_encrypted_1, User1.c_i, USE_BATCH);
+    
 
     //HE Evaluation with Evaluation Key
     cout << "Evaluating using Square operation .... \n" << flush;
