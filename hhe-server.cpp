@@ -73,7 +73,7 @@ int main (int argc, const char * argv[]){
     auto size = parms.save(parms_stream);
     string parms_string = parms_stream.str();
     
-    cout << "Encryption Parameters: wrote " << size << " bytes" << endl;
+    cout << "[Server] Encryption Parameters: wrote " << size << " bytes" << endl;
 
     //Use Encryption Parameters for the Analyst
     KeyGenerator keygen(*context);
