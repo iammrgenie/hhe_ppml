@@ -14,7 +14,7 @@ class SEALZpCipher {
   typedef std::vector<std::vector<uint64_t>> matrix;
 
  protected:
-  std::vector<uint64_t> secret_key;
+//   std::vector<uint64_t> secret_key;
   ZpCipherParams params;
   uint64_t plain_mod;
   uint64_t mod_degree;
@@ -41,8 +41,7 @@ class SEALZpCipher {
   size_t bsgs_n2;
 
  public:
-  SEALZpCipher(ZpCipherParams params, std::vector<uint64_t> secret_key,
-               std::shared_ptr<seal::SEALContext> con);
+  SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::PublicKey pk, seal::SecretKey sk);
 
   virtual ~SEALZpCipher() = default;
   // Size of the secret key in words
@@ -52,7 +51,7 @@ class SEALZpCipher {
   // Size of a plaintext block in words
   size_t get_cipher_size() const { return params.cipher_size; }
   
-  std::vector<seal::Ciphertext> get_sk() const { return secret_key_encrypted; } // DK changes
+  std::vector<seal::Ciphertext> get_enc_sk() const { return secret_key_encrypted; } // DK changes
   seal::PublicKey get_he_pk() const { return he_pk; } // DK changes
   seal::SecretKey get_he_sk() const { return he_sk; } // DK changes
 
@@ -70,7 +69,7 @@ class SEALZpCipher {
   static std::shared_ptr<seal::SEALContext> create_context(size_t mod_degree,
                                                            uint64_t plain_mod,
                                                            int seclevel = 128);
-  virtual void encrypt_key(bool batch_encoder = false) = 0;
+//   virtual void encrypt_key(bool batch_encoder = false) = 0;
   virtual std::vector<seal::Ciphertext> HE_decrypt(
       std::vector<uint64_t>& ciphertext, bool batch_encoder = false) = 0;
   virtual std::vector<uint64_t> decrypt_result(

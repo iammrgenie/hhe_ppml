@@ -42,15 +42,24 @@ add_subdirectory(util)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 
-add_executable(hhe-test tests/initial_test.cpp)                               #The Server in our implementation
+# add_executable(hhe-test tests/initial_test.cpp)                               #The Server in our implementation
+add_executable(one-party-hhe tests/one_party_hhe.cpp)                               #The Server in our implementation
 
+# target_sources(hhe-test
+#         PRIVATE
+#             tests/initial_test.cpp           
+#             SEAL_Cipher.cpp
+#             pasta_3_seal.cpp
+#             pasta_3_plain.cpp
+# )
 
-target_sources(hhe-test
+target_sources(one-party-hhe
         PRIVATE
-            tests/initial_test.cpp           
-            SEAL_Cipher.cpp
-            pasta_3_seal.cpp
-            pasta_3_plain.cpp
+            tests/one_party_hhe.cpp           
+            pasta_modified_1/SEAL_Cipher.cpp
+            pasta_modified_1/pasta_3_seal.cpp
+            pasta_modified_1/pasta_3_plain.cpp
 )
 
-target_link_libraries(hhe-test SEAL::seal keccak aes)
+# target_link_libraries(hhe-test SEAL::seal keccak aes)
+target_link_libraries(one-party-hhe SEAL::seal keccak aes)

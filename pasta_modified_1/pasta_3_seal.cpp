@@ -4,17 +4,32 @@ using namespace seal;
 
 namespace PASTA_3_MODIFIED_1 {
 
-void PASTA_SEAL::encrypt_key(bool batch_encoder) {
+// void PASTA_SEAL::encrypt_key(bool batch_encoder) {
+//   (void)batch_encoder;  // patched implementation: ignore param
+//   secret_key_encrypted.resize(1);
+//   Plaintext k;
+//   std::vector<uint64_t> key_tmp(halfslots + PASTA_T, 0);
+//   for (size_t i = 0; i < PASTA_T; i++) {
+//     key_tmp[i] = secret_key[i];
+//     key_tmp[i + halfslots] = secret_key[i + PASTA_T];
+//   }
+//   this->batch_encoder.encode(key_tmp, k);
+//   encryptor.encrypt(k, secret_key_encrypted[0]);
+// }
+
+std::vector<Ciphertext> PASTA_SEAL::encrypt_key_2(std::vector<uint64_t> ssk, bool batch_encoder) {  // DK changes
   (void)batch_encoder;  // patched implementation: ignore param
-  secret_key_encrypted.resize(1);
+  std::vector<Ciphertext> enc_sk;
+  enc_sk.resize(1);
   Plaintext k;
   std::vector<uint64_t> key_tmp(halfslots + PASTA_T, 0);
   for (size_t i = 0; i < PASTA_T; i++) {
-    key_tmp[i] = secret_key[i];
-    key_tmp[i + halfslots] = secret_key[i + PASTA_T];
+    key_tmp[i] = ssk[i];
+    key_tmp[i + halfslots] = ssk[i + PASTA_T];
   }
   this->batch_encoder.encode(key_tmp, k);
-  encryptor.encrypt(k, secret_key_encrypted[0]);
+  encryptor.encrypt(k, enc_sk[0]);
+  return enc_sk;
 }
 
 //----------------------------------------------------------------
@@ -78,6 +93,69 @@ std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(
   }
   return res;
 }
+
+std::vector<Ciphertext> PASTA_SEAL::HE_decrypt_2(  // DK changes
+    std::vector<uint64_t>& ciphertexts, 
+    std::vector<seal::Ciphertext> enc_ssk,
+    bool batch_encoder) {
+  (void)batch_encoder;  // patched implementation: ignore param
+
+  uint64_t nonce = 123456789;
+  size_t size = ciphertexts.size();
+
+  size_t num_block = ceil((double)size / params.cipher_size);
+
+  Pasta pasta(plain_mod);
+  std::vector<Ciphertext> res(num_block);
+
+  for (uint64_t b = 0; b < num_block; b++) {
+    pasta.init_shake(nonce, b);
+    Ciphertext state = enc_ssk[0];
+
+    for (uint8_t r = 1; r <= PASTA_R; r++) {
+      std::cout << "round " << (int)r << std::endl;
+      auto mat1 = pasta.get_random_matrix();
+      auto mat2 = pasta.get_random_matrix();
+      auto rc = pasta.get_rc_vec(halfslots);
+      matmul(state, mat1, mat2);
+      add_rc(state, rc);
+      mix(state);
+      if (r == PASTA_R)
+        sbox_cube(state);
+      else
+        sbox_feistel(state);
+      print_noise(state);
+    }
+
+    std::cout << "final add" << std::endl;
+    auto mat1 = pasta.get_random_matrix();
+    auto mat2 = pasta.get_random_matrix();
+    auto rc = pasta.get_rc_vec(halfslots);
+    matmul(state, mat1, mat2);
+    add_rc(state, rc);
+    mix(state);
+
+    // remove second vector if needed
+    if (REMOVE_SECOND_VEC) {
+      std::vector<uint64_t> mask_vec(PASTA_T, 1);
+      Plaintext mask;
+      this->batch_encoder.encode(mask_vec, mask);
+      evaluator.multiply_plain_inplace(state, mask);
+    }
+
+    // add cipher
+    std::vector<uint64_t> cipher_tmp;
+    cipher_tmp.insert(
+        cipher_tmp.begin(), ciphertexts.begin() + b * params.cipher_size,
+        ciphertexts.begin() + std::min((b + 1) * params.cipher_size, size));
+    Plaintext p;
+    this->batch_encoder.encode(cipher_tmp, p);
+    evaluator.negate_inplace(state);
+    evaluator.add_plain(state, p, res[b]);
+  }
+  return res;
+}
+
 
 //----------------------------------------------------------------
 
