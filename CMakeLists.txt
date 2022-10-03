@@ -59,6 +59,7 @@ target_sources(one-party-hhe
             pasta_modified_1/SEAL_Cipher.cpp
             pasta_modified_1/pasta_3_seal.cpp
             pasta_modified_1/pasta_3_plain.cpp
+            pasta_modified_1/utils.cpp
 )
 
 # target_link_libraries(hhe-test SEAL::seal keccak aes)

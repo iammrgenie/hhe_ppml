@@ -8,13 +8,17 @@ namespace PASTA_3_MODIFIED_1 {
 SEALZpCipher::SEALZpCipher(ZpCipherParams params,
                            std::shared_ptr<seal::SEALContext> con,
                            seal::PublicKey pk,
-                           seal::SecretKey sk
+                           seal::SecretKey sk,
+                           seal::RelinKeys rk,
+                           seal::GaloisKeys gk
                            )
     : params(params),
       context(con),
-      keygen(*context),
-      he_sk(sk),
+      keygen(*context, sk),
       he_pk(pk),
+      he_sk(sk),
+      he_rk(rk),
+      he_gk(gk),
       encryptor(*context, pk),
       evaluator(*context),
       decryptor(*context, sk),
@@ -22,9 +26,9 @@ SEALZpCipher::SEALZpCipher(ZpCipherParams params,
   // if (secret_key.size() != params.key_size)
   //   throw std::runtime_error("Invalid Key length");
 
-  keygen.create_relin_keys(he_rk);
+  // keygen.create_relin_keys(he_rk);
   // keygen.create_public_key(he_pk);
-  // encryptor.set_public_key(pk);
+  encryptor.set_public_key(pk);
 
   mod_degree = context->first_context_data()->parms().poly_modulus_degree();
   plain_mod = context->first_context_data()->parms().plain_modulus().value();
