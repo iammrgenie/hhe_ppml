@@ -124,7 +124,7 @@ std::vector<Ciphertext> PASTA_SEAL::decomposition(  // DK changes
         sbox_cube(state);
       else
         sbox_feistel(state);
-      print_noise(state);
+      // print_noise(state);
     }
 
     std::cout << "final add" << std::endl;

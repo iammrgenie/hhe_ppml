@@ -72,6 +72,8 @@ int main() {
     // Decryptor analyst_he_dec(*context, Analyst.he_sk);
     print_line(__LINE__);
     cout << "Analyst encrypts his weights and biases" << endl;
+    print_vec(Analyst.w, Analyst.w.size(), "Analyst.w");
+    print_vec(Analyst.b, Analyst.b.size(), "Analyst.b");
     Analyst.w_c = encrypting(Analyst.w, Analyst.he_pk, analyst_he_benc, analyst_he_enc);
     Analyst.b_c = encrypting(Analyst.b, Analyst.he_pk, analyst_he_benc, analyst_he_enc);
     vector<int64_t> w_d = decrypting(Analyst.w_c, Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
@@ -116,16 +118,16 @@ int main() {
     // CSP.c_prime = CSPWorker.HE_decrypt(User.c_i, USE_BATCH);
     CSP.c_prime = CSPWorker.decomposition(User.c_i, User.c_k, USE_BATCH);
     vector<int64_t> dec_c_prime = decrypting(CSP.c_prime[0], Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
-    print_vec(dec_c_prime, dec_c_prime.size(), "dec_c_prime");    
+    print_vec(dec_c_prime, dec_c_prime.size(), "decrypted c_prime");
     print_line(__LINE__);
     cout << "CSP Evaluate a linear transformation using c_prime, Analyst's encrypted weights and biases" << endl;
     packed_enc_multiply(CSP.c_prime[0], Analyst.w_c, CSP.c_res, analyst_he_eval);
     packed_enc_addition(CSP.c_res, Analyst.b_c, CSP.c_res, analyst_he_eval);
     
     cout << endl; print_line(__LINE__); cout << "---- Analyst ----" << endl;
-    cout << "Analyst decrypts the result in CSP.c_res" << endl;
+    cout << "Analyst decrypts the result" << endl;
     vector<int64_t> decrypted_res = decrypting(CSP.c_res, Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
-    print_vec(decrypted_res, decrypted_res.size(), "decrypted_result");
+    print_vec(decrypted_res, decrypted_res.size(), "decrypted result");
 
     return 0;
 }

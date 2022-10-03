@@ -53,11 +53,11 @@ class SEALZpCipher {
   size_t get_cipher_size() const { return params.cipher_size; }
 
   // DK changes
-  std::vector<seal::Ciphertext> get_enc_sk() const { return secret_key_encrypted; } // DK changes
-  seal::PublicKey get_he_pk() const { return he_pk; } // DK changes
-  seal::SecretKey get_he_sk() const { return he_sk; } // DK changes
-  void set_enc_ssk(std::vector<seal::Ciphertext> enc_ssk) { secret_key_encrypted = enc_ssk; }
-  void set_ssk(std::vector<uint64_t> ssk) { secret_key = ssk; }
+//   std::vector<seal::Ciphertext> get_enc_sk() const { return secret_key_encrypted; } // DK changes
+//   seal::PublicKey get_he_pk() const { return he_pk; } // DK changes
+//   seal::SecretKey get_he_sk() const { return he_sk; } // DK changes
+//   void set_enc_ssk(std::vector<seal::Ciphertext> enc_ssk) { secret_key_encrypted = enc_ssk; }
+//   void set_ssk(std::vector<uint64_t> ssk) { secret_key = ssk; }
   // end of DK changes
 
   void add_some_gk_indices(std::vector<int>& gk_ind);
