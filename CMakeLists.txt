@@ -40,10 +40,14 @@ endif()
 add_subdirectory(util)
 
 include_directories(/usr/local/include)
+include_directories(src)
 link_directories(/usr/local/lib)
 
 # add_executable(hhe-test tests/initial_test.cpp)                               #The Server in our implementation
-add_executable(one-party-hhe tests/one_party_hhe.cpp)                               #The Server in our implementation
+# add_executable(one-party-hhe tests/one_party_hhe.cpp)                               #The Server in our implementation
+
+add_executable(server-test hhe-server.cpp)
+add_executable(client-test hhe-client.cpp) 
 
 # target_sources(hhe-test
 #         PRIVATE
@@ -53,9 +57,27 @@ add_executable(one-party-hhe tests/one_party_hhe.cpp)                           
 #             pasta_3_plain.cpp
 # )
 
-target_sources(one-party-hhe
+# target_sources(one-party-hhe
+#         PRIVATE
+#             tests/one_party_hhe.cpp           
+#             src/SEAL_Cipher.cpp
+#             src/pasta_3_seal.cpp
+#             src/pasta_3_plain.cpp
+#             src/utils.cpp
+# )
+
+target_sources(server-test
         PRIVATE
-            tests/one_party_hhe.cpp           
+            hhe-server.cpp           
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+)
+
+target_sources(client-test
+        PRIVATE
+            hhe-client.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -63,4 +85,6 @@ target_sources(one-party-hhe
 )
 
 # target_link_libraries(hhe-test SEAL::seal keccak aes)
-target_link_libraries(one-party-hhe SEAL::seal keccak aes)
+# target_link_libraries(one-party-hhe SEAL::seal keccak aes)
+target_link_libraries(server-test SEAL::seal keccak aes)
+target_link_libraries(client-test SEAL::seal keccak aes)

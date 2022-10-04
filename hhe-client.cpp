@@ -126,19 +126,20 @@ int main (int argc, const char * argv[]){
     char key_length[10];
     recv(clientSocket, key_length, sizeof(key_length) + 1, 0);
 
-    long int sk_size;
-    sscanf(key_length + 1, "%ld", &sk_size);
-    cout << "Key size = " << sk_size << endl;
+    long int pk_size;
+    sscanf(key_length + 1, "%ld", &pk_size);
+    cout << "Key size = " << pk_size << endl;
 
-    //Receive incoming Key
-    char sk_char[sk_size];
-    cout << "[Client] Receiving Secret Key from Server\n";
-    string sk_string;
+    // //Receive incoming Key
+    // char pk_char[80000];
+    // cout << "[Client] Receiving Secret Key from Server\n";
+    
+    // string pk_string;
 
-    recv(clientSocket, sk_char, sizeof(sk_char), 0);
-    for (int j = 0; j < sizeof(sk_char); j ++){
-         sk_string.push_back(sk_char[j]);
-    }
+    // recv(clientSocket, pk_char, sizeof(pk_char), 0);
+    // for (int j = 0; j < sizeof(pk_char); j ++){
+    //      pk_string.push_back(pk_char[j]);
+    // }
 
     // cout << "Received String " << sk_string << "\n\n";
     

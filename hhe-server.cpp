@@ -9,10 +9,11 @@
 #include <iostream>
 #include <sstream>
 
-#include "pasta_3_seal.h"
-#include "sealhelper.h"
-#include "SEAL_Cipher.h"
-#include "pasta_3_plain.h"  // for PASTA_params
+#include "src/pasta_3_seal.h"
+#include "src/sealhelper.h"
+#include "src/SEAL_Cipher.h"
+#include "src/pasta_3_plain.h"  // for PASTA_params
+#include "src/sealhelper.h"
 
 using namespace std;
 using namespace seal;
@@ -34,6 +35,30 @@ struct commData {
     vector<uint64_t> x_p;
 };
 
+void sendKeyData(string &inStr, size_t len, int sockServ) {
+    int numParts = 21;
+
+    //Split into 2
+
+    for (int i = 0; i < numParts; i ++){
+        if (i = 20) {
+            string part = inStr.substr(((i * 50000) + 1), (len - (500000*20)));
+            cout << "Size of Data: " << sizeof(part) << endl;
+        } else {
+            string part = inStr.substr(((i * 50000) + 1), ((i + 1) * 50000));
+            cout << "Size of Data: " << sizeof(part) << endl;
+        }
+    }
+
+    // //Split into 2
+    // part1 = inStr.substr(0, 80000);
+    // part2 = inStr.substr(80001, len);
+
+    // cout << "[Server] Sending Key to Connected Client\n";
+    // send(sockServ, part1.data(), 80000, 0);
+    // send(sockServ, part2.data(), sizeof(part2), 0);
+
+}
 
 int main (int argc, const char * argv[]){
     commData Server1;
@@ -66,8 +91,10 @@ int main (int argc, const char * argv[]){
     parms.set_coeff_modulus(seal::CoeffModulus::BFVDefault(mod_degree));
     }
     parms.set_plain_modulus(plain_mod);
-    auto context = make_shared<seal::SEALContext>(parms, true, sec);
-    SEALContext con1(parms);
+   
+    SEALContext context(parms);
+
+    print_parameters(parms);
 
     //Convert Encryption parameters to a string for communication
     auto size = parms.save(parms_stream);
@@ -76,17 +103,11 @@ int main (int argc, const char * argv[]){
     cout << "[Server] Encryption Parameters: wrote " << size << " bytes" << endl;
 
     //Use Encryption Parameters for the Analyst
-    KeyGenerator keygen(*context);
+    KeyGenerator keygen(context);
     SecretKey he_sk = keygen.secret_key();      //HE Decryption Key
-    PublicKey he_pk;                            //HE Encryption Key
-    keygen.create_public_key(he_pk);
+    Serializable<PublicKey> he_pk = keygen.create_public_key();
     
 
-    //Instantiate the PASTA object
-    PASTA_3::PASTA_SEAL ANALYST_1(context, he_sk, he_pk);
-
-    //Print the necessary parameters to screen
-    ANALYST_1.print_parameters();
 
     //Save and send HE public key
     auto pk_size = he_pk.save(pk_stream);
@@ -161,13 +182,15 @@ int main (int argc, const char * argv[]){
 
         char key_length[10];
         sprintf(key_length, "%ld", sk_size);
-        cout << "[Server] Size of Key = " << key_length << endl;
+        //cout << "[Server] Size of Key = " << key_length << endl;
 
         send(socketClient, key_length, sizeof(key_length) + 1, 0);
+
+        sendKeyData(pk_string, pk_size, socketClient);
         
         //Send the Key
-        cout << "[Server] Sending Key to Connected Client\n";
-        send(socketClient, sk_string.data(), sk_size, 0);
+        // cout << "[Server] Sending Key to Connected Client\n";
+        // send(socketClient, sk_string.data(), sk_size, 0);
 
         // data_stream << pk_string;
 
