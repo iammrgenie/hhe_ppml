@@ -10,36 +10,15 @@
 #include "../pasta_modified_1/sealhelper.h"
 
 #include "symmetric_encryption_test.cpp"
+#include "he_test.cpp"
 
 static const bool USE_BATCH = true;
 
 using namespace std;
 using namespace seal;
 
-// Ciphertext encrypting(vector<int64_t> input, SEALContext context, PublicKey public_key) {
-//     // encode and encrypt the input
-//     BatchEncoder batch_encoder(context);
-//     Encryptor encryptor(context, public_key);
-//     Plaintext plain_input;
-//     batch_encoder.encode(input, plain_input);
-//     Ciphertext enc_input;
-//     encryptor.encrypt(plain_input, enc_input);
-//     return enc_input;
-// }
-
-// vector<int64_t> decrypting(Ciphertext enc_input, SEALContext context, SecretKey secret_key) {
-//     // decrypt and decode the encrypted input
-//     BatchEncoder batch_encoder(context);
-//     Decryptor decryptor(context, secret_key);
-//     Plaintext plain_input;
-//     decryptor.decrypt(enc_input, plain_input);
-//     vector<int64_t> vec_input;
-//     batch_encoder.decode(plain_input, vec_input);
-//     return vec_input;
-// }
-
 struct UserData {
-    vector<uint64_t> symmetric_key;  // the symmetric keys
+    vector<uint64_t> ssk;  // the secret symmetric keys
     vector<uint64_t> x_i{0, 1, 2, 3};
     vector<uint64_t> c_i;  // symmetric encrypted x_i
     std::vector<Ciphertext> c_k;  // the HE encrypted symmetric keys
@@ -50,11 +29,16 @@ struct AnalystData {
     vector<int64_t> b{-5, -5, -5, -5};  // dummy biases
     Ciphertext w_c;  // the encrypted weights
     Ciphertext b_c;  // the encrypted biases
+    PublicKey he_pk;
+    SecretKey he_sk;
+    RelinKeys he_rk;
+    GaloisKeys he_gk;
 };
 
 struct CSPData {
     std::vector<Ciphertext> c_prime;  // the decomposed HE encrypted data of user's c_i
     Ciphertext c_res;  // the HE encrypted results that will be sent to the Analyst
+    SecretKey he_sk;
 };
 
 int main() {
@@ -65,8 +49,7 @@ int main() {
     AnalystData Analyst;
     CSPData CSP;
 
-    print_line(__LINE__);
-    cout << "---- Analyst ----" << endl;
+    cout << endl; print_line(__LINE__); cout << "---- Analyst ----" << endl;
     cout << "Analyst creates the HE parameters and HE context" << endl;
     uint64_t plain_mod = 65537;
     uint64_t mod_degree = 16384;
@@ -74,111 +57,77 @@ int main() {
     shared_ptr<SEALContext> context = get_seal_context(plain_mod, mod_degree, seclevel);
     print_parameters(*context);
     print_line(__LINE__);
-    cout << "Analyst creates the keys from the context" << endl;
+    cout << "Analyst creates the HE keys, batch encoder, encryptor and evaluator from the context" << endl;
     KeyGenerator keygen(*context);
-    SecretKey he_sk = keygen.secret_key();  // HE Decryption Secret Key
-    PublicKey he_pk;  // HE Encryption Public Key
-    keygen.create_public_key(he_pk);
+    Analyst.he_sk = keygen.secret_key();  // HE Decryption Secret Key
+    keygen.create_public_key(Analyst.he_pk);
+    keygen.create_relin_keys(Analyst.he_rk);
+    BatchEncoder analyst_he_benc(*context);
+    Encryptor analyst_he_enc(*context, Analyst.he_pk);
+    Evaluator analyst_he_eval(*context);
+    bool use_bsgs = false;
+    vector<int> gk_indices = add_gk_indices(use_bsgs, analyst_he_benc);
+    keygen.create_galois_keys(gk_indices, Analyst.he_gk);
     print_line(__LINE__);
-    cout << "Analyst creates the batch encoder and encryptor from the context and keys" << endl;
-    BatchEncoder he_benc(*context);
-    Encryptor he_enc(*context, he_pk);
-
-    cout << endl;
+    // Decryptor analyst_he_dec(*context, Analyst.he_sk);
     print_line(__LINE__);
-    cout << "---- User ----" << endl;
-    // Get the random Symmetric Key
+    cout << "Analyst encrypts his weights and biases" << endl;
+    print_vec(Analyst.w, Analyst.w.size(), "Analyst.w");
+    print_vec(Analyst.b, Analyst.b.size(), "Analyst.b");
+    Analyst.w_c = encrypting(Analyst.w, Analyst.he_pk, analyst_he_benc, analyst_he_enc);
+    Analyst.b_c = encrypting(Analyst.b, Analyst.he_pk, analyst_he_benc, analyst_he_enc);
+    vector<int64_t> w_d = decrypting(Analyst.w_c, Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
+    vector<int64_t> b_d = decrypting(Analyst.b_c, Analyst.he_sk, analyst_he_benc, *context, Analyst.b.size());
+    print_line(__LINE__);
+    cout << "Aanalyst decrypts weights and biases to check" << endl;
+    TEST::he_enc_dec_test(Analyst.w, w_d);
+    TEST::he_enc_dec_test(Analyst.b, b_d);
+    
+    cout << endl; print_line(__LINE__); cout << "---- User ----" << endl;
     cout << "User creates the symmetric key" << endl;
-    User.symmetric_key = get_symmetric_key();
-    print_line(__LINE__);
-    // print_vec(User.symmetric_key, User.symmetric_key.size(), "sk");
-    cout << "User encrypts his data using the symmetric key" << endl;
+    User.ssk = get_symmetric_key();
+    // print_vec(User.ssk, User.ssk.size(), "sk");
     print_vec(User.x_i, User.x_i.size(), "User.x_i");
-    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(User.symmetric_key, plain_mod);
+    print_line(__LINE__);
+    cout << "User encrypts his data using the symmetric key" << endl;
+    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(User.ssk, plain_mod);
     User.c_i = SymmetricEncryptor.encrypt(User.x_i);
     print_vec(User.c_i, User.c_i.size(), "User.c_i");
     TEST::symmetric_data_encryption_test(User.x_i, User.c_i, SymmetricEncryptor);
     print_line(__LINE__);
-    cout << "User encrypts his symmetric key using HE" << endl;
-    auto enc_ssk = encrypt_symmetric_key(User.symmetric_key, USE_BATCH, he_benc, he_enc);
-    TEST::symmetric_key_he_encryption_test(User.symmetric_key, USE_BATCH, context, he_sk, he_pk, he_benc, he_enc);
-    // PASTA_3_MODIFIED_1::PASTA_SEAL M1(context, he_sk, he_pk);
-
-    // PASTA_3_MODIFIED_1::PASTA_SEAL CSP(in_key, context);
-    // //Initiate the Class for Encryforwardption and Decryption using PASTA Symmetric Key for Encryption and Decryption
-
-    // //Print the necessary parameters to screen
-    // M1.print_parameters();
-
-    // //compute the HE encryption of the secret key and measure performance
-    // // M1.activate_bsgs(false);
-    // M1.add_gk_indices();
-    // M1.create_gk();
-
-    // //Encrypt the secret key with HE
-    // cout << "\nUsing HE to encrypt the user's symmetric key ..." << flush;
-    // M1.encrypt_key(USE_BATCH);
-    // cout << endl;
-    // cout << "Checking: decrypting the HE encrypted key" << endl;
-    // vector<uint64_t> dec_sym_key;
-    // auto M1_sk = M1.get_enc_sk();
-    // cout << "M1_sk size = " << M1_sk.size() << endl;
-    // dec_sym_key = M1.decrypt_result(M1_sk, USE_BATCH);
-    // cout << "symmetric key size = " << in_key.size() << "; decrypted key size = " << dec_sym_key.size() << endl;
-
-    // auto enc_key2 = M1.encrypt_key_2(in_key, USE_BATCH);
-    // vector<uint64_t> dec_sym_key2;
-    // dec_sym_key2 = M1.decrypt_result(enc_key2, USE_BATCH);
-    // // print_vec(in_key, in_key.size(), "symmetric key");
-    // print_vec(dec_sym_key, dec_sym_key.size(), "dec_sym_key");
-    // print_vec(dec_sym_key2, dec_sym_key2.size(), "dec_sym_key");
-    // if (dec_sym_key != dec_sym_key2) throw runtime_error("decypted keys are different");
-
-    // // Set dummy plaintext and test encryption and decryption
-    // cout << "\nPlaintext user input: " << endl;
-    // print_vec(Test.x_i, Test.x_i.size(), "x_i");
-     
-    // //Encrypt plaintext with the symmetric secret key
-    // cout << "\nSymmetrically encrypt the user input ..." << endl;
-    // Test.c_i = EN.encrypt(Test.x_i);
-    // print_vec(Test.c_i, Test.c_i.size(), "c_i");
-
-    // //Encrypt the analyst's weights and biases
-    // cout << "\nAnalyst's weights and biases in plaintext: " << endl;
-    // print_vec(Analyst.w, Analyst.w.size(), "w");
-    // print_vec(Analyst.b, Analyst.b.size(), "b");
-    // cout << "Encrypting the analyst's weights and biases..." << endl;
-    // // Analyst.w_c = encrypting(Analyst.w, seal_context, M1.get_he_pk());
-    // // Analyst.b_c = encrypting(Analyst.b, seal_context, M1.get_he_pk());
-    // M1.packed_encrypt(Analyst.w_c, Analyst.w);
-    // M1.packed_encrypt(Analyst.b_c, Analyst.b);
-    // cout << "Checking: Analyst decrypts his weights and biases" << endl;
-    // vector<int64_t> w_d, b_d;
-    // // w_d = decrypting(Analyst.w_c, *context, M1.get_he_sk());
-    // // b_d = decrypting(Analyst.b_c, *context, M1.get_he_sk());
-    // M1.packed_decrypt(Analyst.w_c, w_d, Analyst.w.size());
-    // M1.packed_decrypt(Analyst.b_c, b_d, Analyst.b.size());
-    // print_vec(w_d, w_d.size(), "w_d");
-    // print_vec(b_d, b_d.size(), "b_d");
-
-    // //HHE Decomposition using the Symmetric Ciphertext and the HE encrypted key
-    // cout << "\nDecomposing: turn symmetric encrypted data into he encrypted data ...\n" << flush;
-    // // Test.c_1 = M1.HE_decrypt(Test.c_i, USE_BATCH);
-    // Test.c_1 = M1.HE_decrypt_2(Test.c_i, enc_key2, USE_BATCH);
-    // Ciphertext c_prime = Test.c_1[0];
-
-    // //HE Evaluation of the encrypted linear transformation
-    // cout << "\nEvaluating an encrypted linear transformation: c' * w_c + b_c .... \n" << flush;
-    // // Evaluator seal_evaluator(seal_context);
-    // Ciphertext c_res;
-    // M1.packed_enc_mul(Analyst.w_c, c_prime, c_res);
-    // M1.packed_enc_add(Analyst.b_c, c_res, c_res);
-
-    // cout << "\nAnalyst decrypt the result" << endl;
-    // // vector<int64_t> res = decrypting(c_res, seal_context, M1.get_he_sk());
-    // vector<int64_t> res;
-    // M1.packed_decrypt(c_res, res, Analyst.w.size());
-    // print_vec(res, res.size(), "res");
+    cout << "User encrypts his symmetric key using the Analyst's HE configurations" << endl;
+    User.c_k = encrypt_symmetric_key(User.ssk, USE_BATCH, analyst_he_benc, analyst_he_enc);
+    TEST::symmetric_key_he_encryption_test(User.c_k, User.ssk, USE_BATCH, context, 
+                                           Analyst.he_sk, Analyst.he_pk, Analyst.he_rk, Analyst.he_gk,
+                                           analyst_he_benc, analyst_he_enc);
     
+    cout << endl; print_line(__LINE__); cout << "---- CSP ----" << endl;
+    print_line(__LINE__);
+    cout << "CSP creates a new HE secret key from the context" << endl;
+    KeyGenerator csp_keygen(*context);
+    CSP.he_sk = csp_keygen.secret_key();   
+    TEST::he_sk_test(Analyst.he_sk, CSP.he_sk);  // throw an error if 2 keys are the same
+    print_line(__LINE__);
+    cout << "Making a PASTA_SEAL Worker Object for the CSP based on the new CSP HE sk and the Analyst's HE pk" << endl;
+    PASTA_3_MODIFIED_1::PASTA_SEAL CSPWorker(context, Analyst.he_pk, CSP.he_sk, Analyst.he_rk, Analyst.he_gk);
+    print_line(__LINE__);
+    cout << "CSP Decompose: Turning the user's SKE encrypted data c_i into HE encryped c_prime" << endl;
+    // CSPWorker.set_ssk(User.ssk);
+    // CSPWorker.set_enc_ssk(User.c_k);
+    // CSPWorker.encrypt_key(USE_BATCH);
+    // CSP.c_prime = CSPWorker.HE_decrypt(User.c_i, USE_BATCH);
+    CSP.c_prime = CSPWorker.decomposition(User.c_i, User.c_k, USE_BATCH);
+    vector<int64_t> dec_c_prime = decrypting(CSP.c_prime[0], Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
+    print_vec(dec_c_prime, dec_c_prime.size(), "decrypted c_prime");
+    print_line(__LINE__);
+    cout << "CSP Evaluate a linear transformation using c_prime, Analyst's encrypted weights and biases" << endl;
+    packed_enc_multiply(CSP.c_prime[0], Analyst.w_c, CSP.c_res, analyst_he_eval);
+    packed_enc_addition(CSP.c_res, Analyst.b_c, CSP.c_res, analyst_he_eval);
+    
+    cout << endl; print_line(__LINE__); cout << "---- Analyst ----" << endl;
+    cout << "Analyst decrypts the result" << endl;
+    vector<int64_t> decrypted_res = decrypting(CSP.c_res, Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
+    print_vec(decrypted_res, decrypted_res.size(), "decrypted result");
+
     return 0;
 }
