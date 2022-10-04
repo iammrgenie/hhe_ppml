@@ -14,7 +14,7 @@ class SEALZpCipher {
   typedef std::vector<std::vector<uint64_t>> matrix;
 
  protected:
-//   std::vector<uint64_t> secret_key;
+  std::vector<uint64_t> secret_key;
   ZpCipherParams params;
   uint64_t plain_mod;
   uint64_t mod_degree;
@@ -41,7 +41,8 @@ class SEALZpCipher {
   size_t bsgs_n2;
 
  public:
-  SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, seal::PublicKey pk, seal::SecretKey sk);
+  SEALZpCipher(ZpCipherParams params, std::shared_ptr<seal::SEALContext> con, 
+               seal::PublicKey pk, seal::SecretKey sk, seal::RelinKeys rk, seal::GaloisKeys gk);
 
   virtual ~SEALZpCipher() = default;
   // Size of the secret key in words
@@ -50,10 +51,14 @@ class SEALZpCipher {
   size_t get_plain_size() const { return params.plain_size; }
   // Size of a plaintext block in words
   size_t get_cipher_size() const { return params.cipher_size; }
-  
-  std::vector<seal::Ciphertext> get_enc_sk() const { return secret_key_encrypted; } // DK changes
-  seal::PublicKey get_he_pk() const { return he_pk; } // DK changes
-  seal::SecretKey get_he_sk() const { return he_sk; } // DK changes
+
+  // DK changes
+//   std::vector<seal::Ciphertext> get_enc_sk() const { return secret_key_encrypted; } // DK changes
+//   seal::PublicKey get_he_pk() const { return he_pk; } // DK changes
+//   seal::SecretKey get_he_sk() const { return he_sk; } // DK changes
+//   void set_enc_ssk(std::vector<seal::Ciphertext> enc_ssk) { secret_key_encrypted = enc_ssk; }
+//   void set_ssk(std::vector<uint64_t> ssk) { secret_key = ssk; }
+  // end of DK changes
 
   void add_some_gk_indices(std::vector<int>& gk_ind);
   void add_bsgs_indices(uint64_t bsgs_n1, uint64_t bsgs_n2);

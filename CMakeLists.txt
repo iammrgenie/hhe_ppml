@@ -51,6 +51,11 @@ target_sources(hhe-test
             SEAL_Cipher.cpp
             pasta_3_seal.cpp
             pasta_3_plain.cpp
+            tests/one_party_hhe.cpp           
+            pasta_modified_1/SEAL_Cipher.cpp
+            pasta_modified_1/pasta_3_seal.cpp
+            pasta_modified_1/pasta_3_plain.cpp
+            pasta_modified_1/utils.cpp
 )
 
 # target_sources(one-party-hhe
