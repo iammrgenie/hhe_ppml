@@ -3,11 +3,11 @@
 #include <string>
 #include <typeinfo>
 
-#include "../pasta_modified_1/SEAL_Cipher.h"
-#include "../pasta_modified_1/pasta_3_plain.h"  // for PASTA_params
-#include "../pasta_modified_1/pasta_3_seal.h"
-#include "../pasta_modified_1/utils.h"
-#include "../pasta_modified_1/sealhelper.h"
+#include "../src/SEAL_Cipher.h"
+#include "../src/pasta_3_plain.h"  // for PASTA_params
+#include "../src/pasta_3_seal.h"
+#include "../src/utils.h"
+#include "../src/sealhelper.h"
 
 #include "symmetric_encryption_test.cpp"
 #include "he_test.cpp"
@@ -112,13 +112,10 @@ int main() {
     PASTA_3_MODIFIED_1::PASTA_SEAL CSPWorker(context, Analyst.he_pk, CSP.he_sk, Analyst.he_rk, Analyst.he_gk);
     print_line(__LINE__);
     cout << "CSP Decompose: Turning the user's SKE encrypted data c_i into HE encryped c_prime" << endl;
-    // CSPWorker.set_ssk(User.ssk);
-    // CSPWorker.set_enc_ssk(User.c_k);
-    // CSPWorker.encrypt_key(USE_BATCH);
-    // CSP.c_prime = CSPWorker.HE_decrypt(User.c_i, USE_BATCH);
     CSP.c_prime = CSPWorker.decomposition(User.c_i, User.c_k, USE_BATCH);
-    vector<int64_t> dec_c_prime = decrypting(CSP.c_prime[0], Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
-    print_vec(dec_c_prime, dec_c_prime.size(), "decrypted c_prime");
+    // for debugging
+    // vector<int64_t> dec_c_prime = decrypting(CSP.c_prime[0], Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
+    // print_vec(dec_c_prime, dec_c_prime.size(), "decrypted c_prime");
     print_line(__LINE__);
     cout << "CSP Evaluate a linear transformation using c_prime, Analyst's encrypted weights and biases" << endl;
     packed_enc_multiply(CSP.c_prime[0], Analyst.w_c, CSP.c_res, analyst_he_eval);
