@@ -1,6 +1,6 @@
 // #include "../pasta_modified_1/pasta_3_plain.h"
-#include "../pasta_modified_1/pasta_3_seal.h"
-#include "../pasta_modified_1/sealhelper.h"
+#include "../src/pasta_3_seal.h"
+#include "../src/sealhelper.h"
 // #include "../pasta_modified_1/utils.h"
 
 using namespace std;

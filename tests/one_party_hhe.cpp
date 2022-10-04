@@ -3,11 +3,11 @@
 #include <string>
 #include <typeinfo>
 
-#include "../pasta_modified_1/SEAL_Cipher.h"
-#include "../pasta_modified_1/pasta_3_plain.h"  // for PASTA_params
-#include "../pasta_modified_1/pasta_3_seal.h"
-#include "../pasta_modified_1/utils.h"
-#include "../pasta_modified_1/sealhelper.h"
+#include "../src/SEAL_Cipher.h"
+#include "../src/pasta_3_plain.h"  // for PASTA_params
+#include "../src/pasta_3_seal.h"
+#include "../src/utils.h"
+#include "../src/sealhelper.h"
 
 #include "symmetric_encryption_test.cpp"
 #include "he_test.cpp"
