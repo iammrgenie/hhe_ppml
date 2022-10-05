@@ -11,7 +11,7 @@
 #include "../src/sealhelper.h"
 
 #define AVG 1
-#define NUM_VEC 2
+#define NUM_VEC 1
 
 static const bool USE_BATCH = true;
 
@@ -35,8 +35,11 @@ struct ServerData {
 struct UserData {
     vector<uint64_t> plain;
     vector<uint64_t> symCipher;
+};
+
+struct CSPData {
     vector<Ciphertext> heCipher;
-    vector<int64_t> recP;
+    Ciphertext Cres; 
 };
 
 
@@ -50,9 +53,8 @@ int main(){
     size_t parmsT = 0, ciphT = 0;
     size_t encT = 0, decT = 0;
     size_t pkT = 0, rkT = 0, gkT = 0;
-
     
-    
+    // ----------------------------------------------------ANALYST SIDE ----------------------------------------------------------
     //Generate the HHE Parameters
     uint64_t plain_mod = 65537;
     uint64_t mod_degree = 16384;
@@ -71,6 +73,13 @@ int main(){
     vector<int> gk_indices = add_gk_indices(use_bsgs, analyst_he_benc);
     keygen.create_galois_keys(gk_indices, Anal1.he_gk);                   //HHE GaloisKey
 
+    Anal1.w_c = encrypting(Anal1.w, Anal1.he_pk, analyst_he_benc, analyst_he_enc);
+    Anal1.b_c = encrypting(Anal1.b, Anal1.he_pk, analyst_he_benc, analyst_he_enc);
+
+    // ----------------------------------------------------ANALYST SIDE ----------------------------------------------------------
+
+    // ----------------------------------------------------USER SIDE ----------------------------------------------------------
+
     vector<uint64_t> user_ssk = get_symmetric_key();
     PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(user_ssk, plain_mod);
 
@@ -78,15 +87,20 @@ int main(){
 
     for (int j = 0; j < NUM_VEC; j ++){
         User1[j].plain = create_random_vector(4);
-        //print_vec(User1[j].plain, User1[j].plain.size(), "Plaintext ");
+        print_vec(User1[j].plain, User1[j].plain.size(), "Plaintext ");
         User1[j].symCipher = SymmetricEncryptor.encrypt(User1[j].plain);
         print_vec(User1[j].symCipher, User1[j].symCipher.size(), "Ciphertext ");         
     }
+
+    // ----------------------------------------------------USER SIDE ----------------------------------------------------------
+
+    // ----------------------------------------------------SERVER SIDE ----------------------------------------------------------
 
     for (int i = 0; i < AVG; i ++){
         chrono::high_resolution_clock::time_point st1, st2, st3, end1, end2, end3;
         chrono::milliseconds diff1, diff2, diff3;
 
+        CSPData C1[NUM_VEC];
         SecretKey CSP;
         KeyGenerator csp_keygen(*context);
         CSP = csp_keygen.secret_key();   
@@ -97,18 +111,28 @@ int main(){
         st1 = chrono::high_resolution_clock::now();                          //Start the timer
         for (int j = 0; j < NUM_VEC; j++){
             cout << "Data #" << j+1 << endl;
-            User1[j].heCipher = CSPWorker.decomposition(User1[j].symCipher, cK, USE_BATCH);
+            C1[j].heCipher = CSPWorker.decomposition(User1[j].symCipher, cK, USE_BATCH);
         }
         end1 = chrono::high_resolution_clock::now();                          //End the timer
         
         diff1 = chrono::duration_cast<chrono::milliseconds>(end1 - st1);         //Measure the time difference 
         cout << "\n[RES] Ciphertext Decomposition Time for "<< NUM_VEC << " Vectors: " << diff1.count() << " milliseconds" << endl;
 
+        cout << "\n ------------ CSP Classification over Encrypted Data ---------" << endl;
+        st2 = chrono::high_resolution_clock::now(); 
         for (int x = 0; x < NUM_VEC; x++){
-            cout << "\n ------------ CSP Classification over Encrypted Data ---------" << endl;
-            packed_enc_multiply(CSP.c_prime[0], Analyst.w_c, CSP.c_res, analyst_he_eval);
-            packed_enc_addition(CSP.c_res, Analyst.b_c, CSP.c_res, analyst_he_eval);
+            cout << "Data #" << x+1 << endl;
+            packed_enc_multiply(C1[x].heCipher[0], Anal1.w_c, C1[x].Cres, analyst_he_eval);
+            packed_enc_addition(C1[x].Cres, Anal1.b_c, C1[x].Cres, analyst_he_eval);
+
+            // print_vec(Anal1.w, Anal1.w.size(), "Analyst.w");
+            // print_vec(Anal1.b, Anal1.b.size(), "Analyst.b");
+            // vector<int64_t> decrypted_res = decrypting(C1[x].Cres, Anal1.he_sk, analyst_he_benc, *context, Anal1.w.size());
+            // print_vec(decrypted_res, decrypted_res.size(), "decrypted result");
         }
+        end2 = chrono::high_resolution_clock::now(); 
+        diff2 = chrono::duration_cast<chrono::milliseconds>(end2 - st2);         //Measure the time difference 
+        cout << "\n[RES] Encrypted Ciphertext Classification Time for "<< NUM_VEC << " Vectors: " << diff2.count() << " milliseconds" << endl;
 
     }
 
