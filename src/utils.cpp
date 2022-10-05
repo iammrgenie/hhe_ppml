@@ -2,6 +2,10 @@
 
 using namespace std;
 using namespace seal;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::chrono::seconds;
+using std::chrono::system_clock;
 
 vector<uint64_t> get_symmetric_key() {
     return {0x07a30, 0x0cfe2, 0x03bbb, 0x06ab7, 0x0de0b, 0x0c36c, 0x01c39, 0x019e0,
@@ -37,6 +41,21 @@ vector<uint64_t> get_symmetric_key() {
             0x06c6c, 0x0ea76, 0x09af5, 0x0bea6, 0x08eea, 0x0fbb6, 0x09e45, 0x0e9db,
             0x0d106, 0x0e7fd, 0x04ddf, 0x08bb8, 0x0a3a4, 0x03bcd, 0x036d9, 0x05acf,
     };
+}
+
+vector<uint64_t> create_random_vector(size_t size)
+{
+  vector<uint64_t> vec(size);
+  random_device rnd_device;
+  mt19937 mersenne_engine {rnd_device()};  // Generates random integers
+  uniform_int_distribution<int> dist {1, 100};
+  auto gen = [&dist, &mersenne_engine](){
+                   return dist(mersenne_engine);
+               };
+  generate(begin(vec), end(vec), gen);
+
+  return vec;
+
 }
 
 vector<Ciphertext> encrypt_symmetric_key(const vector<uint64_t> &ssk, 
@@ -117,4 +136,12 @@ void packed_enc_addition(const Ciphertext &encrypted1,
                          const Evaluator &evaluator)
 {
   evaluator.add(encrypted1, encrypted2, destination);
+}
+
+template <typename T> 
+size_t save_stuff(T stuff) {
+    stringstream stuff_stream;
+    size_t stuff_size = stuff.save(stuff_stream);
+    // string stuff_string = stuff_stream.str();
+    return stuff_size;
 }
