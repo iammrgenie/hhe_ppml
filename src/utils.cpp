@@ -137,11 +137,3 @@ void packed_enc_addition(const Ciphertext &encrypted1,
 {
   evaluator.add(encrypted1, encrypted2, destination);
 }
-
-template <typename T> 
-size_t save_stuff(T stuff) {
-    stringstream stuff_stream;
-    size_t stuff_size = stuff.save(stuff_stream);
-    // string stuff_string = stuff_stream.str();
-    return stuff_size;
-}
