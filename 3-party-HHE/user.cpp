@@ -12,6 +12,7 @@
 
 #define NUM_RUN 50 // number of runs to get the average measurements
 #define NUM_VEC 10 // number of vectors the user have
+
 static const bool USE_BATCH = true;
 
 struct UserData {

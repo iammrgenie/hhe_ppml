@@ -108,7 +108,10 @@ int main(){
         diff2 = chrono::duration_cast<chrono::milliseconds>(end2 - st2);         //Measure the time difference 
         encT = encT + diff2.count();
 
-        auto ciph1_size = Anal1.w_c.save(Anal1.cipher1_stream);
+        auto ciph1_size = Anal1.w_c.save(Anal1.cipher1_stream); //print_parameters(*context);
+
+        //cout << "\nKey Generation Time: " << diff1.count() << " milliseconds" << endl;
+        parmsT = parmsT + diff1.count();
         auto ciph2_size = Anal1.b_c.save(Anal1.cipher2_stream);
         ciphT = ciphT + ciph1_size;
 
