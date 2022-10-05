@@ -90,3 +90,4 @@ target_sources(3-party-analyst
 target_link_libraries(3-party-server SEAL::seal keccak aes)
 # target_link_libraries(3-party-user SEAL::seal keccak aes)
 target_link_libraries(3-party-analyst SEAL::seal keccak aes)
+

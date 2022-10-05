@@ -51,7 +51,7 @@ std::vector<Ciphertext> PASTA_SEAL::HE_decrypt(
     Ciphertext state = secret_key_encrypted[0];
 
     for (uint8_t r = 1; r <= PASTA_R; r++) {
-      std::cout << "round " << (int)r << std::endl;
+      //std::cout << "round " << (int)r << std::endl;
       auto mat1 = pasta.get_random_matrix();
       auto mat2 = pasta.get_random_matrix();
       auto rc = pasta.get_rc_vec(halfslots);
@@ -113,7 +113,7 @@ std::vector<Ciphertext> PASTA_SEAL::decomposition(  // DK changes
     Ciphertext state = enc_ssk[0];
 
     for (uint8_t r = 1; r <= PASTA_R; r++) {
-      std::cout << "round " << (int)r << std::endl;
+      //std::cout << "round " << (int)r << std::endl;
       auto mat1 = pasta.get_random_matrix();
       auto mat2 = pasta.get_random_matrix();
       auto rc = pasta.get_rc_vec(halfslots);
@@ -127,7 +127,7 @@ std::vector<Ciphertext> PASTA_SEAL::decomposition(  // DK changes
       // print_noise(state);
     }
 
-    std::cout << "final add" << std::endl;
+    //std::cout << "final add" << std::endl;
     auto mat1 = pasta.get_random_matrix();
     auto mat2 = pasta.get_random_matrix();
     auto rc = pasta.get_rc_vec(halfslots);
