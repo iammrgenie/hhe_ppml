@@ -104,6 +104,11 @@ int main(){
         diff1 = chrono::duration_cast<chrono::milliseconds>(end1 - st1);         //Measure the time difference 
         cout << "\n[RES] Ciphertext Decomposition Time for "<< NUM_VEC << " Vectors: " << diff1.count() << " milliseconds" << endl;
 
+        for (int x = 0; x < NUM_VEC; x++){
+            cout << "\n ------------ CSP Classification over Encrypted Data ---------" << endl;
+            packed_enc_multiply(CSP.c_prime[0], Analyst.w_c, CSP.c_res, analyst_he_eval);
+            packed_enc_addition(CSP.c_res, Analyst.b_c, CSP.c_res, analyst_he_eval);
+        }
 
     }
 
