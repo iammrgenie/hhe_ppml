@@ -51,7 +51,7 @@ int main(){
     ServerData Anal1;
     
     size_t parmsT = 0, ciphT = 0;
-    size_t encT = 0, decT = 0;
+    size_t decompT = 0, classT = 0;
     size_t pkT = 0, rkT = 0, gkT = 0;
     
     // ----------------------------------------------------ANALYST SIDE ----------------------------------------------------------
@@ -117,6 +117,7 @@ int main(){
         
         diff1 = chrono::duration_cast<chrono::milliseconds>(end1 - st1);         //Measure the time difference 
         cout << "\n[RES] Ciphertext Decomposition Time for "<< NUM_VEC << " Vectors: " << diff1.count() << " milliseconds" << endl;
+        decompT = decompT + diff1.count();
 
         cout << "\n ------------ CSP Classification over Encrypted Data ---------" << endl;
         st2 = chrono::high_resolution_clock::now(); 
@@ -133,12 +134,13 @@ int main(){
         end2 = chrono::high_resolution_clock::now(); 
         diff2 = chrono::duration_cast<chrono::milliseconds>(end2 - st2);         //Measure the time difference 
         cout << "\n[RES] Encrypted Ciphertext Classification Time for "<< NUM_VEC << " Vectors: " << diff2.count() << " milliseconds" << endl;
+        classT = classT + diff2.count();
 
     }
 
     // //Compute the Average communication and computation
-    // cout << "[RES] Average Key Generation Time over 50 iterations: " << parmsT / AVG << " milliseconds" << endl;
-    // cout << "[RES] Average HE Encryption of Weights and Biases over 50 iterations: " << encT / AVG << " milliseconds" << endl;
+    cout << "\n[RES] Average Ciphertext Decomposition Time over " << AVG << " iterations: " << decompT / AVG << " milliseconds" << endl;
+    cout << "[RES] Average Secure Classification Timer over " << AVG << " iterations: " << classT / AVG << " milliseconds" << endl;
     // cout << "[RES] Average HE Decryption of C(res) over 50 iterations: " << decT / AVG << " milliseconds" << endl;
     // cout << "[RES] Average Public Key size over 50 iterations: " << pkT / AVG << " bytes" << endl;
     // cout << "[RES] Average Relin Key size over 50 iterations: " << rkT / AVG << " bytes" << endl;

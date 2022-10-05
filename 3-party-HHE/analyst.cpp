@@ -127,13 +127,13 @@ int main(){
     }
 
     //Compute the Average communication and computation
-    cout << "[RES] Average Key Generation Time over 50 iterations: " << parmsT / AVG << " milliseconds" << endl;
-    cout << "[RES] Average HE Encryption of Weights and Biases over 50 iterations: " << encT / AVG << " milliseconds" << endl;
+    cout << "[RES] Average Key Generation Time over " << AVG << " iterations: " << parmsT / AVG << " milliseconds" << endl;
+    cout << "[RES] Average HE Encryption of Weights and Biases over " << AVG << " iterations: " << encT / AVG << " milliseconds" << endl;
     cout << "[RES] Average HE Decryption of C(res) over 50 iterations: " << decT / AVG << " milliseconds" << endl;
-    cout << "[RES] Average Public Key size over 50 iterations: " << pkT / AVG << " bytes" << endl;
-    cout << "[RES] Average Relin Key size over 50 iterations: " << rkT / AVG << " bytes" << endl;
-    cout << "[RES] Average Galois Key size over 50 iterations: " << gkT / AVG << " bytes" << endl;
-    cout << "[RES] Ciphertext size over 50 iterations: " << ciphT / AVG << " bytes" << endl;
+    cout << "[RES] Average Public Key size over " << AVG << " iterations: " << pkT / AVG << " bytes" << endl;
+    cout << "[RES] Average Relin Key size over "<< AVG << " iterations: " << rkT / AVG << " bytes" << endl;
+    cout << "[RES] Average Galois Key size over "<< AVG << " iterations: " << gkT / AVG << " bytes" << endl;
+    cout << "[RES] Ciphertext size over "<< AVG << " iterations: " << ciphT / AVG << " bytes" << endl;
 
 
 
