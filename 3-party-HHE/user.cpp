@@ -56,7 +56,7 @@ int main() {
         User.x.clear();
         User.c.clear();
         size_t one_run_time = 0;
-        size_t one_run_memory = get_used_mem_usage(User.c);
+        size_t one_run_memory = 0;
         for (int j = 0; j < NUM_VEC; j++) {
             vector<uint64_t> x_i = create_random_vector(4);
             User.x.push_back(x_i);
