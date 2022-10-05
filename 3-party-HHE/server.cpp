@@ -104,6 +104,7 @@ int main(){
         diff1 = chrono::duration_cast<chrono::milliseconds>(end1 - st1);         //Measure the time difference 
         cout << "\n[RES] Ciphertext Decomposition Time for "<< NUM_VEC << " Vectors: " << diff1.count() << " milliseconds" << endl;
 
+
     }
 
     // //Compute the Average communication and computation
