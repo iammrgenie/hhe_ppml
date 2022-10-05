@@ -45,7 +45,7 @@ link_directories(/usr/local/lib)
 
 # --------------- Create the Executables for Testing ---------------------------
 add_executable(3-party-server 3-party-HHE/server.cpp)                             #Server in 3-party implementation
-add_executable(3-party-client 3-party-HHE/client.cpp)                             #Client in 3-party implementation
+add_executable(3-party-user 3-party-HHE/user.cpp)                             #Client in 3-party implementation
 add_executable(3-party-analyst 3-party-HHE/analyst.cpp)                           #Analyst in 3-party implementation
 
 # add_executable(3-party-server 3-party-HHE/server.cpp)                             #Server in 3-party implementation
@@ -90,4 +90,3 @@ target_sources(3-party-analyst
 target_link_libraries(3-party-server SEAL::seal keccak aes)
 target_link_libraries(3-party-user SEAL::seal keccak aes)
 target_link_libraries(3-party-analyst SEAL::seal keccak aes)
-

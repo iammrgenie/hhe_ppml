@@ -38,4 +38,18 @@ void packed_enc_addition(const Ciphertext &encrypted1,
                          Ciphertext &destination,
                          const Evaluator &evaluator);
 
-template <typename T> size_t save_stuff(T stuff);
+template<typename T>
+size_t get_full_mem_usage(const vector<T>& vec)
+{
+  size_t size_of_vector_struct = sizeof(vector<T>);
+  size_t size_of_single_element = sizeof(T);
+  return size_of_vector_struct + size_of_single_element * vec.capacity();
+}
+
+template<typename T>
+size_t get_used_mem_usage(const vector<T>& vec)
+{
+  size_t size_of_vector_struct = sizeof(vector<T>);
+  size_t size_of_single_element = sizeof(T);
+  return size_of_vector_struct + size_of_single_element * vec.size();
+}
