@@ -4,16 +4,12 @@
 #include <string>
 #include <typeinfo>
 
+#include "../configs/config.h"
 #include "../src/SEAL_Cipher.h"
 #include "../src/pasta_3_plain.h"  // for PASTA_params
 #include "../src/pasta_3_seal.h"
 #include "../src/utils.h"
 #include "../src/sealhelper.h"
-
-
-static const bool USE_BATCH = true;
-
-#define AVG 50
 
 using namespace std;
 using namespace seal; 
@@ -44,14 +40,14 @@ struct AnalystData {
 int main(){
     print_example_banner("Performance and Communication Analysis for the Analyst in the 3-Party Setup");
 
-    // AvgPerformance Test[AVG];
+    // AvgPerformance Test[config::NUM_RUN];
     
     size_t parmsT = 0, ciphT = 0;
     size_t encT = 0, decT = 0;
     size_t pkT = 0, rkT = 0, gkT = 0;
 
 
-    for (int i = 0; i < AVG; i ++){
+    for (int i = 0; i < config::NUM_RUN; i ++){
         AnalystData Anal1;
         chrono::high_resolution_clock::time_point st1, st2, st3, end1, end2, end3;
         chrono::milliseconds diff1, diff2, diff3;
@@ -127,13 +123,13 @@ int main(){
     }
 
     //Compute the Average communication and computation
-    cout << "[RES] Average Key Generation Time over " << AVG << " iterations: " << parmsT / AVG << " milliseconds" << endl;
-    cout << "[RES] Average HE Encryption of Weights and Biases over " << AVG << " iterations: " << encT / AVG << " milliseconds" << endl;
-    cout << "[RES] Average HE Decryption of C(res) over 50 iterations: " << decT / AVG << " milliseconds" << endl;
-    cout << "[RES] Average Public Key size over " << AVG << " iterations: " << pkT / AVG << " bytes" << endl;
-    cout << "[RES] Average Relin Key size over "<< AVG << " iterations: " << rkT / AVG << " bytes" << endl;
-    cout << "[RES] Average Galois Key size over "<< AVG << " iterations: " << gkT / AVG << " bytes" << endl;
-    cout << "[RES] Ciphertext size over "<< AVG << " iterations: " << ciphT / AVG << " bytes" << endl;
+    cout << "[RES] Average Key Generation Time over " << config::NUM_RUN << " iterations: " << parmsT / config::NUM_RUN << " milliseconds" << endl;
+    cout << "[RES] Average HE Encryption of Weights and Biases over " << config::NUM_RUN << " iterations: " << encT / config::NUM_RUN << " milliseconds" << endl;
+    cout << "[RES] Average HE Decryption of C(res) over 50 iterations: " << decT / config::NUM_RUN << " milliseconds" << endl;
+    cout << "[RES] Average Public Key size over " << config::NUM_RUN << " iterations: " << pkT / config::NUM_RUN << " bytes" << endl;
+    cout << "[RES] Average Relin Key size over "<< config::NUM_RUN << " iterations: " << rkT / config::NUM_RUN << " bytes" << endl;
+    cout << "[RES] Average Galois Key size over "<< config::NUM_RUN << " iterations: " << gkT / config::NUM_RUN << " bytes" << endl;
+    cout << "[RES] Ciphertext size over "<< config::NUM_RUN << " iterations: " << ciphT / config::NUM_RUN << " bytes" << endl;
 
 
 
