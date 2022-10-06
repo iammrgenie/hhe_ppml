@@ -16,5 +16,6 @@
 static const bool USE_BATCH = true;
 
 int main() {
-    print_example_banner("Experiments: 2-party HHE User");
+    print_example_banner("Performance and Communication Analysis for the User in the 2-Party HHE Setup");
+    return 0;
 }

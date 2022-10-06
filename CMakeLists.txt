@@ -48,6 +48,9 @@ add_executable(3-party-server 3-party-HHE/server.cpp)                           
 add_executable(3-party-user 3-party-HHE/user.cpp)                             #Client in 3-party implementation
 add_executable(3-party-analyst 3-party-HHE/analyst.cpp)                           #Analyst in 3-party implementation
 
+add_executable(2-party-user 2-party-HHE/user.cpp)                           #Analyst in 3-party implementation
+add_executable(2-party-server 2-party-HHE/server.cpp)                           #Analyst in 3-party implementation
+
 
 # --------------- Link the Executables with the Source Files --------------------
 target_sources(3-party-server
@@ -77,7 +80,29 @@ target_sources(3-party-analyst
             src/utils.cpp
 )
 
+target_sources(2-party-user
+        PRIVATE
+            2-party-HHE/user.cpp           
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+)
+
+target_sources(2-party-server
+        PRIVATE
+            2-party-HHE/server.cpp           
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+)
+
+# --------------------------- Specify libraries or flags to use when linking a given target and/or its dependents ----------------
 target_link_libraries(3-party-server SEAL::seal keccak aes)
 target_link_libraries(3-party-user SEAL::seal keccak aes)
 target_link_libraries(3-party-analyst SEAL::seal keccak aes)
+target_link_libraries(2-party-user SEAL::seal keccak aes)
+target_link_libraries(2-party-server SEAL::seal keccak aes)
+
 
