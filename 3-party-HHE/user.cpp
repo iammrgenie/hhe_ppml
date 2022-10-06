@@ -33,8 +33,9 @@ struct ExperimentResults {
     size_t avg_symmetric_encrypted_data_memory;
 };
 
+
 int main() {
-    print_example_banner("Experiments: 3-party HHE User");
+    print_example_banner("Performance and Communication Analysis for the User in the 3-Party HHE Setup");
 
     UserData User;
     AnalystData Analyst;
