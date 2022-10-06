@@ -33,8 +33,9 @@ struct ExperimentResults {
     size_t avg_symmetric_encrypted_data_memory;
 };
 
+
 int main() {
-    print_example_banner("Experiments: 3-party HHE User");
+    print_example_banner("Performance and Communication Analysis for the User in the 3-Party HHE Setup");
 
     UserData User;
     AnalystData Analyst;
@@ -56,7 +57,7 @@ int main() {
         User.x.clear();
         User.c.clear();
         size_t one_run_time = 0;
-        size_t one_run_memory = get_used_mem_usage(User.c);
+        size_t one_run_memory = 0;
         for (int j = 0; j < NUM_VEC; j++) {
             vector<uint64_t> x_i = create_random_vector(4);
             User.x.push_back(x_i);
