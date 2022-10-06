@@ -44,43 +44,52 @@ include_directories(src)
 link_directories(/usr/local/lib)
 
 # --------------- Create the Executables for Testing ---------------------------
-add_executable(3-party-server 3-party-HHE/server.cpp)                             #Server in 3-party implementation
-add_executable(3-party-user 3-party-HHE/user.cpp)                             #Client in 3-party implementation
-add_executable(3-party-analyst 3-party-HHE/analyst.cpp)                           #Analyst in 3-party implementation
+add_executable(3-party-hhe-server 3-party-HHE/server.cpp)
+add_executable(3-party-hhe-user 3-party-HHE/user.cpp)
+add_executable(3-party-hhe-analyst 3-party-HHE/analyst.cpp)
 
-add_executable(2-party-user 2-party-HHE/user.cpp)                           #Analyst in 3-party implementation
-add_executable(2-party-server 2-party-HHE/server.cpp)                           #Analyst in 3-party implementation
+add_executable(2-party-hhe-user 2-party-HHE/user.cpp)
+add_executable(2-party-hhe-server 2-party-HHE/server.cpp)
 
+add_executable(3-party-he-server 3-party-HE/server.cpp)
+add_executable(3-party-he-user 3-party-HE/user.cpp)
+add_executable(3-party-he-analyst 3-party-HE/analyst.cpp)
+
+add_executable(2-party-he-user 2-party-HE/user.cpp)
+add_executable(2-party-he-server 2-party-HE/server.cpp)
 
 # --------------- Link the Executables with the Source Files --------------------
-target_sources(3-party-server
+target_sources(3-party-hhe-server
         PRIVATE
             3-party-HHE/server.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
             src/utils.cpp
+            configs/config.cpp
 )
 
-target_sources(3-party-user
+target_sources(3-party-hhe-user
         PRIVATE
             3-party-HHE/user.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
             src/utils.cpp
+            configs/config.cpp
 )
 
-target_sources(3-party-analyst
+target_sources(3-party-hhe-analyst
         PRIVATE
             3-party-HHE/analyst.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
             src/utils.cpp
+            configs/config.cpp
 )
 
-target_sources(2-party-user
+target_sources(2-party-hhe-user
         PRIVATE
             2-party-HHE/user.cpp           
             src/SEAL_Cipher.cpp
@@ -90,20 +99,75 @@ target_sources(2-party-user
             configs/config.cpp
 )
 
-target_sources(2-party-server
+target_sources(2-party-hhe-server
         PRIVATE
             2-party-HHE/server.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
             src/utils.cpp
+            configs/config.cpp
+)
+
+target_sources(3-party-he-user
+        PRIVATE
+            3-party-HE/user.cpp        
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+            configs/config.cpp
+)
+
+target_sources(3-party-he-server
+        PRIVATE
+            3-party-HE/server.cpp        
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+            configs/config.cpp
+)
+
+target_sources(3-party-he-analyst
+        PRIVATE
+            3-party-HE/analyst.cpp        
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+            configs/config.cpp
+)
+
+target_sources(2-party-he-user
+        PRIVATE
+            2-party-HE/user.cpp        
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+            configs/config.cpp
+)
+
+target_sources(2-party-he-server
+        PRIVATE
+            2-party-HE/server.cpp        
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+            configs/config.cpp
 )
 
 # --------------------------- Specify libraries or flags to use when linking a given target and/or its dependents ----------------
-target_link_libraries(3-party-server SEAL::seal keccak aes)
-target_link_libraries(3-party-user SEAL::seal keccak aes)
-target_link_libraries(3-party-analyst SEAL::seal keccak aes)
-target_link_libraries(2-party-user SEAL::seal keccak aes)
-target_link_libraries(2-party-server SEAL::seal keccak aes)
+target_link_libraries(3-party-hhe-server SEAL::seal keccak aes)
+target_link_libraries(3-party-hhe-user SEAL::seal keccak aes)
+target_link_libraries(3-party-hhe-analyst SEAL::seal keccak aes)
+target_link_libraries(2-party-hhe-user SEAL::seal keccak aes)
+target_link_libraries(2-party-hhe-server SEAL::seal keccak aes)
 
-
+target_link_libraries(3-party-he-server SEAL::seal keccak aes)
+target_link_libraries(3-party-he-user SEAL::seal keccak aes)
+target_link_libraries(3-party-he-analyst SEAL::seal keccak aes)
+target_link_libraries(2-party-he-server SEAL::seal keccak aes)
+target_link_libraries(2-party-he-user SEAL::seal keccak aes)
