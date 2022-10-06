@@ -3,12 +3,10 @@
 
 namespace config
 {
-    // extern int some_config_int;
-    // extern std::string some_config_string;
-
     extern uint64_t plain_mod;
     extern uint64_t mod_degree;
     extern int seclevel;
+    extern bool use_bsgs;  // used when creating the galois key
 }
 
 #endif
