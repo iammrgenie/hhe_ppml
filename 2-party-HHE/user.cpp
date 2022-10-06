@@ -47,7 +47,7 @@ int main() {
     keygen.create_galois_keys(gk_indices, User.he_gk);  
 
     // Create the symmetric key
-
+    
     // Encrypt the symmetric key
 
     // Symmetrically encrypt the data

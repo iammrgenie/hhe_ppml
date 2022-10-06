@@ -137,3 +137,19 @@ void packed_enc_addition(const Ciphertext &encrypted1,
 {
   evaluator.add(encrypted1, encrypted2, destination);
 }
+
+void packed_plain_multiply(const Ciphertext &encrypted,
+                           const Plaintext &plain,
+                           Ciphertext &destination, 
+                           const Evaluator &evaluator)
+{
+  evaluator.multiply_plain(encrypted, plain, destination);
+}
+
+void packed_plain_addition(const Ciphertext &encrypted, 
+                           const Plaintext &plain, 
+                           Ciphertext &destination,
+                           const Evaluator &evaluator)
+{
+  evaluator.add_plain(encrypted, plain, destination);
+}

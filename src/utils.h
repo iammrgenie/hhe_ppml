@@ -53,3 +53,13 @@ size_t get_used_mem_usage(const vector<T>& vec)
   size_t size_of_single_element = sizeof(T);
   return size_of_vector_struct + size_of_single_element * vec.size();
 }
+
+void packed_plain_multiply(const Ciphertext &encrypted,
+                           const Plaintext &plain,
+                           Ciphertext &destination, 
+                           const Evaluator &evaluator);
+
+void packed_plain_addition(const Ciphertext &encrypted, 
+                           const Plaintext &plain, 
+                           Ciphertext &destination,
+                           const Evaluator &evaluator);
