@@ -12,6 +12,7 @@ namespace config
     extern uint64_t NUM_RUN;  // Number of runs to average over and get the final experimental results
     extern uint64_t NUM_VEC;  // Number of vectors that the user has
     extern bool USE_BATCH;
+    extern size_t user_vector_size;  // the length of each user's vector data
 }
 
 #endif

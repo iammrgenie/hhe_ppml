@@ -10,11 +10,6 @@
 #include "../src/utils.h"
 #include "../src/sealhelper.h"
 
-#define NUM_RUN 50 // number of runs to get the average measurements
-#define NUM_VEC 10 // number of vectors the user have
-
-static const bool USE_BATCH = true;
-
 int main() {
     print_example_banner("Performance and Communication Analysis for the Server in the 2-Party HHE Setup");
     return 0;

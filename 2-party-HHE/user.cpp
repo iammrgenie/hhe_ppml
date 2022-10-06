@@ -74,7 +74,7 @@ int main() {
         size_t pk_size = User.he_pk.save(pks);
         size_t rk_size = User.he_rk.save(rks);
         size_t gk_size = User.he_gk.save(gks);
-        total_he_key_memory += pk_size + rk_size + gk_size + params_size;
+        total_he_key_memory += rk_size + gk_size + params_size;
         
         // Create the symmetric key
         User.ssk = get_symmetric_key();
@@ -88,7 +88,7 @@ int main() {
         size_t one_run_time = 0;
         size_t one_run_memory = 0;
         for (int j = 0; j < config::NUM_VEC; j++) {
-            vector<uint64_t> x_i = create_random_vector(4);
+            vector<uint64_t> x_i = create_random_vector(config::user_vector_size);
             User.x.push_back(x_i);
             // print_vec(User.x[j], x_i.size(), "x_i");
             st1 = chrono::high_resolution_clock::now();  // Start the timer

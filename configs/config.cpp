@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <cstddef>
 
 namespace config
 {
@@ -7,6 +8,7 @@ namespace config
     int seclevel = 128;
     bool use_bsgs = false;
     uint64_t NUM_RUN = 50;
-    uint64_t NUM_VEC = 10;
+    uint64_t NUM_VEC = 50;
     bool USE_BATCH = true;
+    size_t user_vector_size = 4;
 }
