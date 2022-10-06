@@ -15,6 +15,8 @@ vector<uint64_t> get_symmetric_key();
 
 vector<uint64_t> create_random_vector(size_t size);
 
+vector<int64_t> create_random_int_vector(size_t size);
+
 vector<Ciphertext> encrypt_symmetric_key(const vector<uint64_t> &ssk, bool batch_encoder, 
                                          const BatchEncoder &benc, const Encryptor &enc);
 
@@ -53,3 +55,16 @@ size_t get_used_mem_usage(const vector<T>& vec)
   size_t size_of_single_element = sizeof(T);
   return size_of_vector_struct + size_of_single_element * vec.size();
 }
+
+void packed_plain_multiply(const Ciphertext &encrypted,
+                           const Plaintext &plain,
+                           Ciphertext &destination, 
+                           const Evaluator &evaluator);
+
+void packed_plain_addition(const Ciphertext &encrypted, 
+                           const Plaintext &plain, 
+                           Ciphertext &destination,
+                           const Evaluator &evaluator);
+
+Ciphertext create_random_encrypted_vector(size_t size, const PublicKey &he_pk, 
+                                          const BatchEncoder &benc, const Encryptor &enc);
