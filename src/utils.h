@@ -15,6 +15,8 @@ vector<uint64_t> get_symmetric_key();
 
 vector<uint64_t> create_random_vector(size_t size);
 
+vector<int64_t> create_random_int_vector(size_t size);
+
 vector<Ciphertext> encrypt_symmetric_key(const vector<uint64_t> &ssk, bool batch_encoder, 
                                          const BatchEncoder &benc, const Encryptor &enc);
 
@@ -63,3 +65,6 @@ void packed_plain_addition(const Ciphertext &encrypted,
                            const Plaintext &plain, 
                            Ciphertext &destination,
                            const Evaluator &evaluator);
+
+Ciphertext create_random_encrypted_vector(size_t size, const PublicKey &he_pk, 
+                                          const BatchEncoder &benc, const Encryptor &enc);

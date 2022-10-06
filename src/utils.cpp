@@ -58,6 +58,21 @@ vector<uint64_t> create_random_vector(size_t size)
 
 }
 
+vector<int64_t> create_random_int_vector(size_t size)
+{
+  vector<int64_t> vec(size);
+  random_device rnd_device;
+  mt19937 mersenne_engine {rnd_device()};  // Generates random integers
+  uniform_int_distribution<int> dist {1, 100};
+  auto gen = [&dist, &mersenne_engine](){
+                   return dist(mersenne_engine);
+               };
+  generate(begin(vec), end(vec), gen);
+
+  return vec;
+
+}
+
 vector<Ciphertext> encrypt_symmetric_key(const vector<uint64_t> &ssk, 
                                          bool batch_encoder,
                                          const BatchEncoder &benc,
@@ -152,4 +167,14 @@ void packed_plain_addition(const Ciphertext &encrypted,
                            const Evaluator &evaluator)
 {
   evaluator.add_plain(encrypted, plain, destination);
+}
+
+Ciphertext create_random_encrypted_vector(size_t size,  
+                                          const PublicKey &he_pk, 
+                                          const BatchEncoder &benc, 
+                                          const Encryptor &enc) 
+{
+  vector<int64_t> v = create_random_int_vector(size);
+  Ciphertext c = encrypting(v, he_pk, benc, enc);
+  return c;
 }
