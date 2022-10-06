@@ -87,6 +87,7 @@ target_sources(2-party-user
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
             src/utils.cpp
+            configs/config.cpp
 )
 
 target_sources(2-party-server
