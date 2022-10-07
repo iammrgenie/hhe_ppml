@@ -114,14 +114,18 @@ int main() {
         size_t size = (User.c_k[0]).save(s);
         total_encrypted_key_memory += size;
         
+		size_t one_run_decryption_time = 0;
+        for (int j = 0; j < config::NUM_VEC; j++) {
         // Decrypt the result got from the CSP
-        User.c_res = create_random_encrypted_vector(config::user_vector_size, User.he_pk, user_he_benc, user_he_enc);
-        st3 = chrono::high_resolution_clock::now(); 
-        vector<int64_t> decrypted_res = decrypting(User.c_res, User.he_sk, user_he_benc, *context, config::user_vector_size);
-        end3 = chrono::high_resolution_clock::now(); 
-        t3 = chrono::duration_cast<chrono::milliseconds>(end3 - st3);         //Measure the time difference
-        //print_vec(decrypted_res, decrypted_res.size(), "Decrypted Result");
-        total_result_decryption_time += t3.count();
+            User.c_res = create_random_encrypted_vector(config::user_vector_size, User.he_pk, user_he_benc, user_he_enc);
+            st3 = chrono::high_resolution_clock::now(); 
+        	vector<int64_t> decrypted_res = decrypting(User.c_res, User.he_sk, user_he_benc, *context, config::user_vector_size);
+			end3 = chrono::high_resolution_clock::now(); 
+			t3 = chrono::duration_cast<chrono::milliseconds>(end3 - st3);         //Measure the time difference
+			//print_vec(decrypted_res, decrypted_res.size(), "Decrypted Result");
+			one_run_decryption_time += t3.count();
+        }
+		total_result_decryption_time += one_run_decryption_time;
     }
     
     // Calculate avg measurements and print out results
