@@ -82,15 +82,19 @@ int main() {
         auto size1 = Analyst.w_c.save(ws); //print_parameters(*context);
         auto size2 = Analyst.b_c.save(bs);
         total_he_wb_data_memory += size1 + size2;
-
-        // Decrypt results
-        Analyst.c_res = create_random_encrypted_vector(config::user_vector_size, Analyst.he_pk, analyst_he_benc, analyst_he_enc);
-        st2 = chrono::high_resolution_clock::now(); 
-        vector<int64_t> decrypted_res = decrypting(Analyst.c_res, Analyst.he_sk, analyst_he_benc, *context, config::user_vector_size);
-        end2 = chrono::high_resolution_clock::now(); 
-        t2 = chrono::duration_cast<chrono::milliseconds>(end2 - st2);         //Measure the time difference
-        //print_vec(decrypted_res, decrypted_res.size(), "Decrypted Result");
-        total_result_decryption_time += t2.count();
+        
+        size_t one_run_decryption_time = 0;
+        for (int j = 0; j < config::NUM_VEC; j++) {
+			// Decrypt results
+			Analyst.c_res = create_random_encrypted_vector(config::user_vector_size, Analyst.he_pk, analyst_he_benc, analyst_he_enc);
+			st2 = chrono::high_resolution_clock::now(); 
+			vector<int64_t> decrypted_res = decrypting(Analyst.c_res, Analyst.he_sk, analyst_he_benc, *context, config::user_vector_size);
+			end2 = chrono::high_resolution_clock::now(); 
+			t2 = chrono::duration_cast<chrono::milliseconds>(end2 - st2);         //Measure the time difference
+			//print_vec(decrypted_res, decrypted_res.size(), "Decrypted Result");
+			one_run_decryption_time += t2.count();
+        }
+		total_result_decryption_time += one_run_decryption_time;
     }
 
     ExpRes.avg_he_key_gen_time = total_he_key_gen_time / config::NUM_RUN;
