@@ -44,24 +44,26 @@ include_directories(src)
 link_directories(/usr/local/lib)
 
 # --------------- Create the Executables for Testing ---------------------------
-add_executable(3-party-hhe-server 3-party-HHE/server.cpp)
-add_executable(3-party-hhe-user 3-party-HHE/user.cpp)
-add_executable(3-party-hhe-analyst 3-party-HHE/analyst.cpp)
+add_executable(3-party-hhe-server experiments/3-party-HHE/server.cpp)
+add_executable(3-party-hhe-user experiments/3-party-HHE/user.cpp)
+add_executable(3-party-hhe-analyst experiments/3-party-HHE/analyst.cpp)
 
-add_executable(2-party-hhe-user 2-party-HHE/user.cpp)
-add_executable(2-party-hhe-server 2-party-HHE/server.cpp)
+add_executable(2-party-hhe-user experiments/2-party-HHE/user.cpp)
+add_executable(2-party-hhe-server experiments/2-party-HHE/server.cpp)
 
-add_executable(3-party-he-server 3-party-HE/server.cpp)
-add_executable(3-party-he-user 3-party-HE/user.cpp)
-add_executable(3-party-he-analyst 3-party-HE/analyst.cpp)
+add_executable(3-party-he-server experiments/3-party-HE/server.cpp)
+add_executable(3-party-he-user experiments/3-party-HE/user.cpp)
+add_executable(3-party-he-analyst experiments/3-party-HE/analyst.cpp)
 
-add_executable(2-party-he-user 2-party-HE/user.cpp)
-add_executable(2-party-he-server 2-party-HE/server.cpp)
+add_executable(2-party-he-user experiments/2-party-HE/user.cpp)
+add_executable(2-party-he-server experiments/2-party-HE/server.cpp)
+
+add_executable(simple-hhe protocols/simple_hhe.cpp)
 
 # --------------- Link the Executables with the Source Files --------------------
 target_sources(3-party-hhe-server
         PRIVATE
-            3-party-HHE/server.cpp           
+            experiments/3-party-HHE/server.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -71,7 +73,7 @@ target_sources(3-party-hhe-server
 
 target_sources(3-party-hhe-user
         PRIVATE
-            3-party-HHE/user.cpp           
+            experiments/3-party-HHE/user.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -81,7 +83,7 @@ target_sources(3-party-hhe-user
 
 target_sources(3-party-hhe-analyst
         PRIVATE
-            3-party-HHE/analyst.cpp           
+            experiments/3-party-HHE/analyst.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -91,7 +93,7 @@ target_sources(3-party-hhe-analyst
 
 target_sources(2-party-hhe-user
         PRIVATE
-            2-party-HHE/user.cpp           
+            experiments/2-party-HHE/user.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -101,7 +103,7 @@ target_sources(2-party-hhe-user
 
 target_sources(2-party-hhe-server
         PRIVATE
-            2-party-HHE/server.cpp           
+            experiments/2-party-HHE/server.cpp           
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -111,7 +113,7 @@ target_sources(2-party-hhe-server
 
 target_sources(3-party-he-user
         PRIVATE
-            3-party-HE/user.cpp        
+            experiments/3-party-HE/user.cpp        
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -121,7 +123,7 @@ target_sources(3-party-he-user
 
 target_sources(3-party-he-server
         PRIVATE
-            3-party-HE/server.cpp        
+            experiments/3-party-HE/server.cpp        
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -131,7 +133,7 @@ target_sources(3-party-he-server
 
 target_sources(3-party-he-analyst
         PRIVATE
-            3-party-HE/analyst.cpp        
+            experiments/3-party-HE/analyst.cpp        
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -141,7 +143,7 @@ target_sources(3-party-he-analyst
 
 target_sources(2-party-he-user
         PRIVATE
-            2-party-HE/user.cpp        
+            experiments/2-party-HE/user.cpp        
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -151,7 +153,17 @@ target_sources(2-party-he-user
 
 target_sources(2-party-he-server
         PRIVATE
-            2-party-HE/server.cpp        
+            experiments/2-party-HE/server.cpp        
+            src/SEAL_Cipher.cpp
+            src/pasta_3_seal.cpp
+            src/pasta_3_plain.cpp
+            src/utils.cpp
+            configs/config.cpp
+)
+
+target_sources(simple-hhe
+        PRIVATE
+            protocols/simple_hhe.cpp        
             src/SEAL_Cipher.cpp
             src/pasta_3_seal.cpp
             src/pasta_3_plain.cpp
@@ -171,3 +183,5 @@ target_link_libraries(3-party-he-user SEAL::seal keccak aes)
 target_link_libraries(3-party-he-analyst SEAL::seal keccak aes)
 target_link_libraries(2-party-he-server SEAL::seal keccak aes)
 target_link_libraries(2-party-he-user SEAL::seal keccak aes)
+
+target_link_libraries(simple-hhe SEAL::seal keccak aes)

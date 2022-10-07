@@ -4,12 +4,12 @@
 #include <string>
 #include <typeinfo>
 
-#include "../configs/config.h"
-#include "../src/SEAL_Cipher.h"
-#include "../src/pasta_3_plain.h"  // for PASTA_params
-#include "../src/pasta_3_seal.h"
-#include "../src/utils.h"
-#include "../src/sealhelper.h"
+#include "../../configs/config.h"
+#include "../../src/SEAL_Cipher.h"
+#include "../../src/pasta_3_plain.h"  // for PASTA_params
+#include "../../src/pasta_3_seal.h"
+#include "../../src/utils.h"
+#include "../../src/sealhelper.h"
 
 struct UserData {
     vector<vector<int64_t>> x;  // plaintext data
@@ -30,7 +30,7 @@ struct ExperimentResults {
 };
 
 int main() {
-    print_example_banner("Performance and Communication Analysis for the User in the 3-Party HE Setup");
+    print_example_banner("Performance and Communication Analysis for the User in the 2-Party HE Setup");
 
     UserData User;
     ExperimentResults ExpRes;
@@ -87,9 +87,17 @@ int main() {
             stringstream s;
             one_run_memory += c_i.save(s);
         }
-        // cout << one_run_memory << endl;
         total_he_data_encryption_time += one_run_time;
         total_he_encrypted_data_memory += one_run_memory;
+
+        // Decrypt the results
+        User.c_res = create_random_encrypted_vector(config::user_vector_size, User.he_pk, user_he_benc, user_he_enc);
+        st3 = chrono::high_resolution_clock::now(); 
+        vector<int64_t> decrypted_res = decrypting(User.c_res, User.he_sk, user_he_benc, *context, config::user_vector_size);
+        end3 = chrono::high_resolution_clock::now(); 
+        t3 = chrono::duration_cast<chrono::milliseconds>(end3 - st3);         //Measure the time difference
+        //print_vec(decrypted_res, decrypted_res.size(), "Decrypted Result");
+        total_result_decryption_time += t3.count();
     }
 
     ExpRes.avg_he_key_gen_time = total_he_key_gen_time / config::NUM_RUN;
@@ -109,6 +117,11 @@ int main() {
     print_line(__LINE__);
     cout << "--- RESULT: avg HE data memory calculated over " << config::NUM_RUN << 
             " runs when the user has " << config::NUM_VEC << " vectors = " << ExpRes.avg_he_encrypted_data_memory << " bytes" << endl;
+
+    ExpRes.avg_result_decryption_time = total_result_decryption_time / config::NUM_RUN;
+    print_line(__LINE__);
+    cout << "--- RESULT: avg result decryption time over " << config::NUM_RUN << 
+            " runs = " << ExpRes.avg_result_decryption_time << " ms" << endl;
 
     return 0;
 }

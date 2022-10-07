@@ -4,12 +4,12 @@
 #include <string>
 #include <typeinfo>
 
-#include "../configs/config.h"
-#include "../src/SEAL_Cipher.h"
-#include "../src/pasta_3_plain.h"  // for PASTA_params
-#include "../src/pasta_3_seal.h"
-#include "../src/utils.h"
-#include "../src/sealhelper.h"
+#include "../../configs/config.h"
+#include "../../src/SEAL_Cipher.h"
+#include "../../src/pasta_3_plain.h"  // for PASTA_params
+#include "../../src/pasta_3_seal.h"
+#include "../../src/utils.h"
+#include "../../src/sealhelper.h"
 
 struct UserData {
     vector<uint64_t> ssk;  // the secret symmetric keys
@@ -115,10 +115,9 @@ int main() {
         total_encrypted_key_memory += size;
         
         // Decrypt the result got from the CSP
-        size_t decrypted_size = 4;
-        User.c_res = create_random_encrypted_vector(decrypted_size, User.he_pk, user_he_benc, user_he_enc);
+        User.c_res = create_random_encrypted_vector(config::user_vector_size, User.he_pk, user_he_benc, user_he_enc);
         st3 = chrono::high_resolution_clock::now(); 
-        vector<int64_t> decrypted_res = decrypting(User.c_res, User.he_sk, user_he_benc, *context, decrypted_size);
+        vector<int64_t> decrypted_res = decrypting(User.c_res, User.he_sk, user_he_benc, *context, config::user_vector_size);
         end3 = chrono::high_resolution_clock::now(); 
         t3 = chrono::duration_cast<chrono::milliseconds>(end3 - st3);         //Measure the time difference
         //print_vec(decrypted_res, decrypted_res.size(), "Decrypted Result");
