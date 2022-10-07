@@ -4,12 +4,12 @@
 #include <string>
 #include <typeinfo>
 
-#include "../configs/config.h"
-#include "../src/SEAL_Cipher.h"
-#include "../src/pasta_3_plain.h"  // for PASTA_params
-#include "../src/pasta_3_seal.h"
-#include "../src/utils.h"
-#include "../src/sealhelper.h"
+#include "../../configs/config.h"
+#include "../../src/SEAL_Cipher.h"
+#include "../../src/pasta_3_plain.h"  // for PASTA_params
+#include "../../src/pasta_3_seal.h"
+#include "../../src/utils.h"
+#include "../../src/sealhelper.h"
 
 struct UserData {
     vector<uint64_t> ssk;  // the secret symmetric keys

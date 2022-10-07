@@ -1,3 +1,6 @@
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <vector>
 #include <algorithm>
 #include <iterator>
@@ -68,3 +71,5 @@ void packed_plain_addition(const Ciphertext &encrypted,
 
 Ciphertext create_random_encrypted_vector(size_t size, const PublicKey &he_pk, 
                                           const BatchEncoder &benc, const Encryptor &enc);
+
+#endif

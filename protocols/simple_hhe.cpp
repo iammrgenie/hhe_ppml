@@ -3,16 +3,14 @@
 #include <string>
 #include <typeinfo>
 
+#include "../configs/config.h"
 #include "../src/SEAL_Cipher.h"
 #include "../src/pasta_3_plain.h"  // for PASTA_params
 #include "../src/pasta_3_seal.h"
 #include "../src/utils.h"
 #include "../src/sealhelper.h"
-
-#include "symmetric_encryption_test.cpp"
-#include "he_test.cpp"
-
-static const bool USE_BATCH = true;
+#include "../tests/symmetric_encryption_test.cpp"
+#include "../tests/he_test.cpp"
 
 using namespace std;
 using namespace seal;
@@ -51,10 +49,7 @@ int main() {
 
     cout << endl; print_line(__LINE__); cout << "---- Analyst ----" << endl;
     cout << "Analyst creates the HE parameters and HE context" << endl;
-    uint64_t plain_mod = 65537;
-    uint64_t mod_degree = 16384;
-    int seclevel = 128;
-    shared_ptr<SEALContext> context = get_seal_context(plain_mod, mod_degree, seclevel);
+    shared_ptr<SEALContext> context = get_seal_context(config::plain_mod, config::mod_degree, config::seclevel);
     print_parameters(*context);
     print_line(__LINE__);
     cout << "Analyst creates the HE keys, batch encoder, encryptor and evaluator from the context" << endl;
@@ -90,14 +85,14 @@ int main() {
     print_vec(User.x_i, User.x_i.size(), "User.x_i");
     print_line(__LINE__);
     cout << "User encrypts his data using the symmetric key" << endl;
-    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(User.ssk, plain_mod);
+    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(User.ssk, config::plain_mod);
     User.c_i = SymmetricEncryptor.encrypt(User.x_i);
     print_vec(User.c_i, User.c_i.size(), "User.c_i");
     TEST::symmetric_data_encryption_test(User.x_i, User.c_i, SymmetricEncryptor);
     print_line(__LINE__);
     cout << "User encrypts his symmetric key using the Analyst's HE configurations" << endl;
-    User.c_k = encrypt_symmetric_key(User.ssk, USE_BATCH, analyst_he_benc, analyst_he_enc);
-    TEST::symmetric_key_he_encryption_test(User.c_k, User.ssk, USE_BATCH, context, 
+    User.c_k = encrypt_symmetric_key(User.ssk, config::USE_BATCH, analyst_he_benc, analyst_he_enc);
+    TEST::symmetric_key_he_encryption_test(User.c_k, User.ssk, config::USE_BATCH, context, 
                                            Analyst.he_sk, Analyst.he_pk, Analyst.he_rk, Analyst.he_gk,
                                            analyst_he_benc, analyst_he_enc);
     
@@ -112,7 +107,7 @@ int main() {
     PASTA_3_MODIFIED_1::PASTA_SEAL CSPWorker(context, Analyst.he_pk, CSP.he_sk, Analyst.he_rk, Analyst.he_gk);
     print_line(__LINE__);
     cout << "CSP Decompose: Turning the user's SKE encrypted data c_i into HE encryped c_prime" << endl;
-    CSP.c_prime = CSPWorker.decomposition(User.c_i, User.c_k, USE_BATCH);
+    CSP.c_prime = CSPWorker.decomposition(User.c_i, User.c_k, config::USE_BATCH);
     // for debugging
     // vector<int64_t> dec_c_prime = decrypting(CSP.c_prime[0], Analyst.he_sk, analyst_he_benc, *context, Analyst.w.size());
     // print_vec(dec_c_prime, dec_c_prime.size(), "decrypted c_prime");
