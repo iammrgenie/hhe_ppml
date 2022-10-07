@@ -13,16 +13,14 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 ```
 ├── configs              
 │   ├── config.cpp  # hold the configurations (HE parameters, number of runs for experiments...)
-├── experiments     # ho 
-├── asio-1.24.0  # the library for  
-├── notebooks 
-├── outputs
-├── src  
-|   ├── client.py  # code for the client
-|   ├── server.py  # code for the server
-└── weights
+├── experiments     # hold the code for the experiments reported in the paper   
+├── images          # hold the images in `README.md`
+├── protocols       # hold the demonstration code for the protocols 
+├── src             # hold the component code needed for other code 
+├── tests           # hold the unit tests
+└── util            # hold the utility code used in PASTA and for data communication via sockets
  ```
-
+ 
 ## Running
 In the terminal, `cd` into the project's directory, then run
 - `cmake -S . -B build`  
