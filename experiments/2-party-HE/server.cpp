@@ -47,7 +47,7 @@ int main() {
     server_he_benc.encode(Server.w, Server.plain_w);
     server_he_benc.encode(Server.b, Server.plain_b);
 
-        // Doing evaluation on encrypted data, encrypted weights and biases
+    // Doing evaluation on encrypted data, plaintext weights and biases
     for (int i = 0; i < config::NUM_RUN; i++) {
         Server.c_res.clear();
         size_t one_run_time = 0;

@@ -51,10 +51,7 @@ int main(){
     
     // ----------------------------------------------------ANALYST SIDE ----------------------------------------------------------
     //Generate the HHE Parameters
-    uint64_t plain_mod = 65537;
-    uint64_t mod_degree = 16384;
-    int seclevel = 128;
-    shared_ptr<SEALContext> context = get_seal_context(plain_mod, mod_degree, seclevel);
+    shared_ptr<SEALContext> context = get_seal_context(config::plain_mod, config::mod_degree, config::seclevel);
     KeyGenerator keygen(*context);
     Anal1.he_sk = keygen.secret_key();                                    //HHE Decryption Secret Key
     keygen.create_public_key(Anal1.he_pk);                                //HHE Encryption Key
@@ -64,8 +61,7 @@ int main(){
     Encryptor analyst_he_enc(*context, Anal1.he_pk);
     Evaluator analyst_he_eval(*context);
 
-    bool use_bsgs = false;
-    vector<int> gk_indices = add_gk_indices(use_bsgs, analyst_he_benc);
+    vector<int> gk_indices = add_gk_indices(config::use_bsgs, analyst_he_benc);
     keygen.create_galois_keys(gk_indices, Anal1.he_gk);                   //HHE GaloisKey
 
     Anal1.w_c = encrypting(Anal1.w, Anal1.he_pk, analyst_he_benc, analyst_he_enc);
@@ -76,12 +72,12 @@ int main(){
     // ----------------------------------------------------USER SIDE ----------------------------------------------------------
 
     vector<uint64_t> user_ssk = get_symmetric_key();
-    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(user_ssk, plain_mod);
+    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(user_ssk, config::plain_mod);
 
     vector<Ciphertext> cK = encrypt_symmetric_key(user_ssk, config::USE_BATCH, analyst_he_benc, analyst_he_enc);
 
     for (int j = 0; j < config::NUM_VEC; j ++){
-        User1[j].plain = create_random_vector(4);
+        User1[j].plain = create_random_vector(config::user_vector_size);
         print_vec(User1[j].plain, User1[j].plain.size(), "Plaintext ");
         User1[j].symCipher = SymmetricEncryptor.encrypt(User1[j].plain);
         print_vec(User1[j].symCipher, User1[j].symCipher.size(), "Ciphertext ");         
