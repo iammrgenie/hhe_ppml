@@ -38,7 +38,7 @@ struct AnalystData {
 // };
 
 int main(){
-    print_example_banner("Performance and Communication Analysis for the Analyst in the 3-Party Setup");
+    print_example_banner("Performance and Communication Analysis for the Analyst in the 3-Party HHE Setup");
 
     // AvgPerformance Test[config::NUM_RUN];
     
@@ -109,7 +109,7 @@ int main(){
         //cout << "\nKey Generation Time: " << diff1.count() << " milliseconds" << endl;
         // parmsT = parmsT + diff1.count();
         auto ciph2_size = Anal1.b_c.save(Anal1.cipher2_stream);
-        ciphT = ciphT + ciph1_size;
+        ciphT = ciphT + ciph1_size + ciph2_size;
 
         // Decrypt the returned Ciphertext
         // cout << "Analyst decrypts the result" << endl;
