@@ -8,7 +8,6 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 
 [Here](https://github.com/microsoft/SEAL) are the instructions for installing the Microsoft's SEAL library. Our code are developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
 
-## Structure
 ## Repository Structure
 ```
 ├── configs              
@@ -20,7 +19,7 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 ├── tests           # hold the unit tests
 └── util            # hold the utility code used in PASTA and for data communication via sockets
  ```
- 
+
 ## Running
 In the terminal, `cd` into the project's directory, then run
 - `cmake -S . -B build`  
