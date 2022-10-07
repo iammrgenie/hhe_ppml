@@ -41,15 +41,25 @@ int main() {
     // print_vec(User.x_i, User.x_i.size(), "User.x_i");
     User.ssk = get_symmetric_key();
     
-    cout << "User encrypts his data using the symmetric key" << endl;
-    uint64_t plain_mod = 65537;
-    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(User.ssk, plain_mod);
+    // cout << "Analyst creates the HE parameters and HE context" << endl;
+    shared_ptr<SEALContext> context = get_seal_context(config::plain_mod, config::mod_degree, config::seclevel);
+    KeyGenerator keygen(*context);
+    keygen.create_public_key(Analyst.he_pk);
+    BatchEncoder analyst_he_benc(*context);
+    Encryptor analyst_he_enc(*context, Analyst.he_pk);
+    Evaluator analyst_he_eval(*context);
+
+    // cout << "User encrypts his data using the symmetric key" << endl;
+    PASTA_3_MODIFIED_1::PASTA SymmetricEncryptor(User.ssk, config::plain_mod);
     chrono::high_resolution_clock::time_point st1, st2, end1, end2;
     chrono::milliseconds t1, t2;
-    size_t total_time = 0;
-    size_t total_memory = 0;
-    // Measuring symmetric data encryption time and memory  
+    size_t total_symmetric_enc_time = 0;
+    size_t total_symmetric_enc_data_memory = 0;    
+    size_t total_key_enc_time = 0;
+    size_t total_encrypted_key_memory = 0;
+
     for (int i = 0; i < config::NUM_RUN; i++) {
+        // Measuring symmetric data encryption time and memory  
         // After each run, clean the vectors User.x and User.c
         User.x.clear();
         User.c.clear();
@@ -67,37 +77,10 @@ int main() {
             one_run_time += t1.count();
             one_run_memory += get_used_mem_usage(c_i);
         }
-        // cout << one_run_memory << endl;
-        total_time += one_run_time;
-        total_memory += one_run_memory;
-    }
-    // cout << "total symmetric encryption time over " << config::NUM_RUN << 
-    //         " runs when user has " << config::NUM_VEC << " vectors = " << total_time << " ms" << endl;
-    ExpRes.avg_sym_enc_time = total_time / config::NUM_RUN;
-    print_line(__LINE__);
-    cout << "--- RESULT: avg symmetric encryption time over " << config::NUM_RUN << 
-            " runs when user has " << config::NUM_VEC << " vectors = " << ExpRes.avg_sym_enc_time << " ms" << endl;
-    // print_vec(User.c_i, User.c_i.size(), "User.c_i"); 
-    print_line(__LINE__);
-    ExpRes.avg_symmetric_encrypted_data_memory = total_memory / config::NUM_RUN;
-    cout << "--- RESULT: avg symmetric encrypted data memory over " << config::NUM_RUN << 
-            " runs when user has " << config::NUM_VEC << " vectors = " << ExpRes.avg_symmetric_encrypted_data_memory << " bytes" << endl;
+        total_symmetric_enc_time += one_run_time;
+        total_symmetric_enc_data_memory += one_run_memory;
 
-    // cout << "Analyst creates the HE parameters and HE context" << endl;
-    uint64_t mod_degree = 16384;
-    int seclevel = 128;
-    shared_ptr<SEALContext> context = get_seal_context(plain_mod, mod_degree, seclevel);
-    KeyGenerator keygen(*context);
-    keygen.create_public_key(Analyst.he_pk);
-    BatchEncoder analyst_he_benc(*context);
-    Encryptor analyst_he_enc(*context, Analyst.he_pk);
-    Evaluator analyst_he_eval(*context);
-
-    // Measuring symmetric key encryption using HE
-    // cout << "User encrypts his symmetric key using the Analyst's HE configurations" << endl;
-    size_t total_key_enc_time = 0;
-    size_t total_encrypted_key_memory = 0;
-    for (int i = 0; i < config::NUM_RUN; i++) {
+        // Measuring symmetric key encryption using HE
         st2 = chrono::high_resolution_clock::now();  // Start the timer
         User.c_k = encrypt_symmetric_key(User.ssk, config::USE_BATCH, analyst_he_benc, analyst_he_enc);
         end2 = chrono::high_resolution_clock::now();  // End the timer
@@ -108,6 +91,17 @@ int main() {
         size_t size = (User.c_k[0]).save(s);
         total_encrypted_key_memory += size;
     }
+
+    ExpRes.avg_sym_enc_time = total_symmetric_enc_time / config::NUM_RUN;
+    print_line(__LINE__);
+    cout << "--- RESULT: avg symmetric encryption time over " << config::NUM_RUN << 
+            " runs when user has " << config::NUM_VEC << " vectors = " << ExpRes.avg_sym_enc_time << " ms" << endl;
+    // print_vec(User.c_i, User.c_i.size(), "User.c_i"); 
+    print_line(__LINE__);
+    ExpRes.avg_symmetric_encrypted_data_memory = total_symmetric_enc_data_memory / config::NUM_RUN;
+    cout << "--- RESULT: avg symmetric encrypted data memory over " << config::NUM_RUN << 
+            " runs when user has " << config::NUM_VEC << " vectors = " << ExpRes.avg_symmetric_encrypted_data_memory << " bytes" << endl;
+
     ExpRes.avg_key_enc_time = total_key_enc_time / config::NUM_RUN;
     ExpRes.avg_encrypted_key_memory = total_encrypted_key_memory / config::NUM_RUN;
     print_line(__LINE__);
