@@ -158,5 +158,10 @@ int main() {
     cout << "--- RESULT: avg result decryption time over " << config::NUM_RUN << 
             " runs = " << ExpRes.avg_res_decryption_time << " ms" << endl;
 
+    print_line(__LINE__);
+    cout << "--- RESULT: avg symmetric encrypted data memory & HE encrypted key memory over " << config::NUM_RUN << 
+            " runs when user has " << config::NUM_VEC << " vectors = " << 
+            ExpRes.avg_symmetric_encrypted_data_memory + ExpRes.avg_encrypted_key_memory << " bytes" << endl;
+    
     return 0;
 }
