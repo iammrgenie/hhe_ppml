@@ -6,21 +6,19 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 `CMAKE>=3.13`  
 `SEAL==4.0.0`  
 
-[Here](https://github.com/microsoft/SEAL) are the instructions for installing the Microsoft's SEAL library. Our code are developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
+[Here](https://github.com/microsoft/SEAL) are the instructions for installing the Microsoft's SEAL library, which is used for HE 
+ the library used . Our code are developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
 
-## Structure
 ## Repository Structure
 ```
 ├── configs              
 │   ├── config.cpp  # hold the configurations (HE parameters, number of runs for experiments...)
-├── experiments     # ho 
-├── asio-1.24.0  # the library for  
-├── notebooks 
-├── outputs
-├── src  
-|   ├── client.py  # code for the client
-|   ├── server.py  # code for the server
-└── weights
+├── experiments     # hold the code for the experiments reported in the paper
+├── images          # hold the images in `README.md`
+├── protocols       # hold the demo code for the protocols in the paper
+├── src             # hold the components needed to build the protocols 
+├── tests           # hold the unit tests
+└── util            # hold the utility code used in PASTA and for data communication via sockets
  ```
 
 ## Running
