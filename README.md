@@ -7,7 +7,7 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 `SEAL==4.0.0`  
 
 [Here](https://github.com/microsoft/SEAL) are the instructions for installing the Microsoft's SEAL library, which is used for HE 
- the library used . Our code are developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
+ the library used . Our application is developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
 
 ## Repository Structure
 ```
