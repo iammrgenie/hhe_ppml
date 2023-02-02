@@ -6,8 +6,7 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 `CMAKE>=3.13`  
 `SEAL==4.0.0`  
 
-[Here](https://github.com/microsoft/SEAL) are the instructions for installing the Microsoft's SEAL library, which is used for HE 
- the library used . Our code are developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
+The [Microsoft SEAL library](https://github.com/microsoft/SEAL) is already installed in `libs/seal`. Also, our code are developed based on the [PASTA framework for HHE](https://github.com/IAIK/hybrid-HE-framework).
 
 ## Repository Structure
 ```
@@ -23,7 +22,7 @@ A Privacy-Preserving Machine Learning (PPML) protocol that is resource friendly 
 
 ## Running
 In the terminal, `cd` into the project's directory, then run
-- `cmake -S . -B build`  
+- `cmake -S . -B build -DCMAKE_PREFIX_PATH=libs/seal`  
 - `cmake --build build`  
-- Then, run the produced executables in `./build`. For example, the result of running `./build/simple_hhe` can be something like in the figure below
+- Then, run the produced executables in `./build`. For example running `./build/simple_hhe` will produce something similar to the figure below
 ![one_party_hhe](./images/one_party_hhe_run.png)
